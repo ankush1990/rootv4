@@ -1,0 +1,77 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* body with background image*/
+body {
+    background: url(../images/root2.png);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.jumbotron {height:80%;}
+
+/* Backgroud color only*/
+.all_bgcolor{
+	background-color:#134562;
+}
+
+/* Backgroud color with white font color*/
+.all_bgcolor_withfontcolor{
+	background-color:#134562;
+	color:#FFF;
+}
+
+/*Button Effect with all color Codes*/
+.all-btn-custom {
+  border-radius: 0;
+  background-color: #2F506C;
+  border-color: #134562;
+  color:#FFF;
+  font-weight:bold;
+}
+.all-btn-custom:hover,
+.all-btn-custom:focus,
+.all-btn-custom:active,
+.all-btn-custom.active {
+  background-color: #134562;
+  border-color: #134562;
+  color:#FFF;
+}
+
+/* Test blue color with hover effetc*/
+.all-text-hovereffect{
+	cursor:pointer; color:#2F506C; text-decoration:none;
+}
+
+.all-text-hovereffect:hover{
+	color:#134562;
+	text-decoration:none;
+}
+
+/* Test blue color with bold hover effetc*/
+.all-text-hovereffect-bold{
+	cursor:pointer; font-weight:bold; color:#2F506C; text-decoration:none;
+}
+
+.all-text-hovereffect-bold:hover{
+	color:#134562;
+	text-decoration:none;
+}
+
+/* With out border radius*/
+input[type='text']{
+	border-radius: 0;
+}
+
+input[type='password']{
+	border-radius: 0;
+}
+
+.input-group-addon-withoutradius{
+	border-radius: 0;
+}
