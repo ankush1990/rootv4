@@ -1,7 +1,8 @@
 // JavaScript Document
 
 function ajax_request(bool,pagename,data_parameters,functionname){
-	var data_url = "http://192.168.1.102:1837/"+pagename;
+	var data_url = "http://192.168.2.34:1837/"+pagename;
+	//var data_url = "http://50.116.21.72:1837/"+pagename;
 	var http_request = new XMLHttpRequest();
 	try{
 	   http_request = new XMLHttpRequest();
@@ -33,3 +34,26 @@ function ajax_request(bool,pagename,data_parameters,functionname){
 
 
 
+/*
+$(function(){
+	$('#save_sensor_stp_form').click(function(e){
+		 if(name_val!='' && sensor_nm!=''){
+			e.preventDefault(); // prevent the browser's default action of submitting 
+			$.ajax({
+				type: "POST",
+				url: "save_setup_sensor.php",
+				data: $("#sensor_setup_form").serialize(),
+				beforeSend: function(){
+					$('#result').html('<img src="loading.gif" />');
+				},
+				success: function(data){
+				}
+			});
+		}else{
+	
+	
+		 }
+
+});
+});
+*/

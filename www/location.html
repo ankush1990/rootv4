@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row"><br/>
+    	<div id="addLocationdiv1"> 
+            <!--addlocation div-->
+            <div id="addLocationdiv" class="col-sm-3" style="border:1px solid #CCC;">
+                <h4><b>Add New Location</b></h4><hr>
+                    <div id="Locationalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div class="alert alert-success fade">
+                        <strong>Success! </strong> Location added successfully.
+                        </div>
+                    </div>
+                    
+                    <div id="Locationnameerrorheader" class="form-group has-feedback">
+                    
+                     <label for="inputError2">Location Name</label>
+                         <input type="text" class="form-control" id="Locationname" onKeyUp="checkLocationname('true',this.value)">
+                         <input type="hidden" id="Locationnamevalidatecheck" \>
+                         <span id="Locationnameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                         <span id="Locationnamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                         <span id="Locationnamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                         <span id="Locationnamewarning" style="display:none;" class="help-block">Name already exists.</span>
+                    </div>
+                    
+                    <div class="form-group has-feedback" id="classificationheader">
+                    <label for="inputError2">Classification</label>
+                    <select id="ass_classification_id" class="form-control select-box-drop" onChange="loadclassificationdetail('true',this.value)">
+                    <option value="">Select Classfication</option>
+                    </select>
+                    <span id="classificationerror" style="display:none;" class="help-block">Please select classification</span>
+                    </div>
+                    
+                    <div class="form-group has-feedback" id="classificationdtheader">
+                        <label for="inputError2">Classification Description</label>
+                        <select id="ass_classification_detailid" class="form-control select-box-drop">
+                        <option value="">Select Classfication Description</option>
+                        </select>
+                    <span id="classificationdterror" style="display:none;" class="help-block">Please select classification description</span>
+                    </div>
+                
+                    <button onClick="saveLocation(true,Locationname.value)" type="button" id="Locationaddbutton" class="all-btn-custom btn-sm btn-block ">
+                        <span class="glyphicon glyphicon-plus"></span> ADD
+                    </button>
+                    <br />
+            </div><!--end addlocation div-->
+        
+<!-- ===============start location Added succefull============-->
+<div id="locationsuccesssalert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info alert-modal-success">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Location added successfully.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============end location Added succefull============-->
+       
+<!-- ===============Update Detail Success============-->
+<div id="locationupdatesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Location updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Update Detail Success============-->
+
+        
+            <!--  Edit Department  -->   
+            <div id="editLocationdiv" class="col-sm-3" style="border:1px solid #CCC; display:none;">
+                <h4><b>Edit Location</b></h4><hr>
+                    <div id="editLocationalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div id="deptalert" class="alert alert-success fade">
+                        <strong>Success! </strong> Location Updated successfully.
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback" id="editLocationerrorheader2">
+                        <label for="inputError2">Location Name</label>
+                        <input type="text" class="form-control" id="editLocationname" onKeyUp="editcheckLocationname('true',this.value)">
+                        <input type="hidden" id="editLocationvalidatecheck" \>
+                        <input type="hidden" id="editLocationid" \>
+                        
+                        <span id="editLocationerror2" style="display:none;" class="help-block">Please fill out this field</span>
+                        <span id="editLocationsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                        <span id="editLocationwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                        <span id="editLocationwarning" style="display:none;" class="help-block">Location already exists</span>
+                        
+                    </div>
+                    
+                    <div class="form-group has-feedback" id="editclassificationheader">
+                    <label for="inputError2">Classification</label>
+                    <select id="editass_classification_id" class="form-control select-box-drop" onChange="editloadclassificationdetail('true',this.value)">
+                    <option value="">Select Classfication</option>
+                    </select>
+                    <span id="editclassificationerror" style="display:none;" class="help-block">Please select classification</span>
+                    </div>
+                    
+                    <div class="form-group has-feedback" id="editclassificationdtheader">
+                        <label for="inputError2">Classification Description</label>
+                        <select id="editass_classification_detailid" class="form-control select-box-drop">
+                        <option value="">Select Classfication Description</option>
+                        </select>
+                    <span id="editclassificationdterror" style="display:none;" class="help-block">Please select classification description</span>
+                    <br/>
+                    <b>Active</b> <input type="checkbox" id="locationactiveyn" checked />
+            		</div>
+                
+                    <div class="form-group">         
+                        <button  class="btn-exit" style="width:49%" onClick="exitlocationdivhide()">Exit</button>
+                        <button id="editlocationdate" class="btn-adddetail" style="width:49%" onClick="editlocationname(true,editLocationname.value)">Update</button>
+                    </div>
+                    <br />
+            </div>
+            <!--  Edit Department  -->  
+        
+ 
+            <div  id="loadLocationdetaildata" class="col-sm-9">
+            <table id="locationdatatable" class="table table-hover">
+               <thead>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Location List</h4>
+                        </div>
+                    </div>
+                  <tr>
+                     <th>Location</th><th>Classification</th><th>Class Description</th><th>Modified By</th><th>Modified On</th><th>Action</th>
+                  </tr>
+               </thead>
+               <tbody id="Locationdataload"></tbody>
+             </table>   
+            </div>
+        </div>
+	</div><!--  end Row  -->  
+</div><!--  end container  -->
+</body>
+<script src="js/pagesjs/location.js"></script>
+<script>
+dropdownclassificationdata(true,"ok");
+loadloactiondata(true,"ok");
+</script>
+</html>

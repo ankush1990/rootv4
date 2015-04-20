@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Root</title>
+<link rel="icon" href="images/favicon.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Root - magnum energy solutions">
+<meta name="author" content="Magnum">
+
+<link href='css/bootstrap.min.css' rel='stylesheet'>
+<link href='css/config.css' rel='stylesheet'>
+<link rel="stylesheet" href="css/loadingspin/custom.css">
+<link rel="stylesheet" href="css/loadingspin/iosOverlay.css">
+<link rel="stylesheet" href="css/loadingspin/prettify.css">
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/ajax_request.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var d = new Date();
+	var n = d.toDateString();
+	n = n.substr(4,n.length);
+	document.getElementById("header-date").innerHTML = n;
+	$(".close").click(function(){
+		$("#myAlert").alert('close');
+	});
+}); 
+
+var email = "";
+function validate(bool,response){
+	if(bool){
+		callspinloadersuccess();//loading icon function
+		email = response;
+		pagename = "email_exists";
+		flag = "A";
+		var data_parameters = "slocid="+0+ "&orgid="+0+ "&id="+0+ "&emailid="+response+ "&flag="+flag;
+		ajax_request(true,pagename,data_parameters,validate);
+		return false;
+	}else{
+		var obj = JSON.parse(response);
+		if(obj[0].status == "N"){
+			document.getElementById("error-message").style.display = 'block';
+			document.getElementById("error-message").innerHTML  = '<div id="myAlert" class="bs-example">\<div class="alert alert-danger alert-error">\
+			<a  class="close" data-dismiss="alert">&times;</a>\<strong>Error! </strong>Email address not registered.</div>';
+		}else{
+			sendmail(true,email);
+		}
+	}
+}
+
+function sendmail(bool,response){
+	if(bool){
+		callspinloaderupdate();//email sent alert
+		setTimeout(function (){callspinloaderupdatehide()},1000);// hide email sent alert
+		pagename = "forgot_password";
+		var data_parameters = "emailid="+response;
+		ajax_request(true,pagename,data_parameters,sendmail);
+		return false;
+	}else{
+		var obj = JSON.parse(response);
+		$("#email").val("");
+		window.location="index.html";
+	}
+}
+</script>
+</head>
+<body>
+<!--Included header-->
+<div class="jumbotron all_bgcolor_withfontcolor" style="margin-top: -40px;">
+	<div class="col-sm-1"></div>
+    	<div class="col-sm-8"><span style="font-size:32px"><a href="index.html" style="text-decoration:none; color:#FFF;">[ root ]</a></span></div>
+        <div  class="col-sm-3"><span id="header-date" style="font-size:26px"></span></div>
+    	<p></p>    
+</div>
+<!--Alert for incorrect Username and Password-->
+<div class="col-sm-12" >
+    <div class="col-sm-4"></div>
+        <div class="col-sm-4" id="error-message" >
+        </div>
+</div>
+
+<!--Code for Email fields-->
+<div class="col-sm-9">
+  <div class="row">
+  	<div class="col-sm-6"></div>
+    <div class="col-sm-4" >
+    	<label>Can't sign in? Forgot your password?</label>
+        <div class="form-group">
+            <div class="col-md-10 control">
+                <div style="border-top: 1px solid#888; padding-top:15px; margin-top:10px;" >
+                 
+                </div>
+            </div>
+       </div>    
+    </div>
+    
+    <div class="clearfix"></div>
+    
+    <div class="col-sm-6"></div>
+    <div class="col-sm-4" >
+   
+    <form method="post" action="index.html" role="form" autocomplete="off" onsubmit="return validate(true,email.value)">
+   		<label style="font-weight:normal;">Enter your <b>registered email address</b>. we'll send you password reset instructions.</label>
+      	<div id="emailcheck" class="input-group" style="margin-bottom:15px; margin-top:10px;">
+            <span class="input-group-addon" style="border-radius:0px;">
+                <i class="glyphicon glyphicon-envelope"></i>
+            </span>
+            <input id="email" class="form-control" type="email" required  value="" name="email">
+        </div>
+        <div class="form-group">
+       	<input type="submit" name="submit" class="btn btn-custom	 btn-sm btn-block all-btn-custom" value="Send me reset instructions">
+       	</div>
+    </form>
+    
+    </div>
+  </div>
+</div>
+<!--Included Footer-->
+<div class="footer navbar-fixed-bottom all_bgcolor">
+  <div class="container">
+    <p></p>
+  </div>
+</div>
+</body>
+<script src="js/loadingspin/iosOverlay.js"></script> 
+<script src="js/loadingspin/spin.min.js"></script> 
+<script src="js/loadingspin/prettify.js"></script> 
+<script src="js/loadingspin/custom.js"></script>
+</html>

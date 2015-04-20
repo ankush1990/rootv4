@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>root</title>
+<meta name="robots" content="Root" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="copyright" content="Root" />
+</head>
+<body>
+<script>showloadingimage();</script>
+<script type="text/javascript" src="pagination/jquery.bootpag.js"></script>
+<link href="pagination/prettify.css" type="text/css" rel="stylesheet" />
+
+<script type="text/javascript" src="pagination/prettify.js"></script>
+<script type="text/javascript" src="js/pagination.js"></script>
+<script type="text/javascript">
+var userarr="";
+var global_mapuserid = "";
+
+var pagenum;
+var pageismade = 0;
+var globalobjmsg;
+var searchstring = 0;
+
+function loadmessage(bool,response){
+	if(bool){
+		pagename = "get_inbox";
+		var pagecount = 7;
+		pagenum = response;
+		var searchtext = $("#msgsearch").val();
+		if(searchtext.length > 0){
+			if(searchstring != searchtext.length){
+				pageismade = 0;
+				searchstring = searchtext.length;
+			}
+			searchtext = searchtext;
+		}
+		else searchtext = "NA";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&pagenum="+pagenum+ "&pagecount="+pagecount+ "&searchtext="+searchtext;
+		ajax_request(true,pagename,data_parameters,loadmessage);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		globalobjmsg = obj;
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+				str += '<tr><td id="wrapdatatable">'+obj[i].msg_remarks+'</td><td>'+obj[i].create_dt+'</td><td>'+obj[i].sent_by+'</td><td>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-th-list" style="cursor:pointer" title="View" onClick="showdeliverstatus(\''+obj[i].create_dt+'\',\''+obj[i].sent_by+'\',\''+i+'\')"></span></td></tr>';	
+			}
+			document.getElementById("messagedataload").innerHTML = str;
+			if(pageismade == 0){
+				makepagination('messagepagination_bottom',obj[0].cnt,pagenum,loadmessage);
+				pageismade++;
+			}
+		}
+	}
+}
+
+
+function showdeliverstatus(sentdate,sentby,value){
+	var str = '<table class="table" id="tblthermGrid"><tbody>';
+	str += '<tr><td style="font-weight:bold">Sent On</td><td>:</td><td>'+sentdate+'</td></tr>';	
+	str += '<tr><td  style="font-weight:bold">Sent By</td><td>:</td><td>'+sentby+'</td></tr>';	
+	str += '<tr><td style="font-weight:bold">Message</td><td>:</td><td>'+globalobjmsg[value].msg_remarks+'</td></tr>';	
+	str += '</tbody></table>';
+	document.getElementById("messagedetailinner").innerHTML = str;
+	$('#messagedetail').modal({keyboard: true});
+}
+
+</script>
+
+<div class="container" style="margin-top:0px;">
+    <div class="row"><br/>
+    
+        <!-- ===============Details for message deliver============-->
+        <div id="messagedetail" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-info alert-modal-success">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Message Details</h4>
+                        </div>
+                        <div class="modal-body" id="messagedetailinner">
+                         
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        </div>
+                        
+                    </div>
+                </div>
+        </div>
+        <!-- ===============Details for message deliver============-->
+
+    	  <div  id="loadmessagedetaildata" class="col-sm-12">
+                <table id="messagedatatable" class="table table-hover">
+                   <thead>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="padding:10px 15px;">
+                                <h4>Broadcast Message List</h4>
+                                 <div class="btn-group pull-right">
+                                     <div class="form-group has-feedback">
+                                        <input type="text" class="form-control" id="msgsearch" placeholder="Search" onKeyUp="loadmessage('true','1')"/>
+                                        <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                                    </div>
+                                </div>
+                            </div>
+                		</div>
+                      <tr>
+                         <th>Message</th><th>Sent on</th><th>Sent by</th><th>Action</th>
+                      </tr>
+                   </thead>
+                   <tbody id="messagedataload">
+                   </tbody>
+                 </table>   
+              </div>
+              <p class="messagepagination_bottom" style="text-align:right;"></p>
+        </div>
+	</div>
+</div>
+</body>
+<script>
+
+loadmessage(true,1);
+</script>
+</html>
+ 

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>root</title>
+<meta name="robots" content="Root" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="copyright" content="Root" />
+<link href='css/config.css' rel='stylesheet' />
+</head>
+<body>
+<style>
+#waitcursor{
+	cursor:wait; height:300px; overflow:scroll;
+}
+</style>
+<script>showloadingimage();</script>
+<script type="text/javascript">
+
+var thermid = localStorage.getItem("thermid");
+
+var schedule_string = '';
+var schedule_string_obj = "";
+function loadschedulestring(bool,response){
+	if(bool){
+		pagename = "get_schedule";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid;
+		ajax_request(true,pagename,data_parameters,loadschedulestring);
+	}else{
+		var obj = JSON.parse(response);
+		schedule_string_obj = obj;
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+					schedule_string += '<option value="'+obj[i].schedule_id+'">'+obj[i].schedule_name+'</option>';
+			}
+			schedule_string += '</select></div>';
+			loadroomstring(true,"ok;");
+		}
+	}
+}
+
+// load roomdata in dropdown
+var room_string = '';
+var room_string_obj = "";
+
+function loadroomstring(bool,response){
+	if(bool){
+		pagename = "get_room";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid;
+		ajax_request(true,pagename,data_parameters,loadroomstring);
+	}else{
+		var obj = JSON.parse(response);
+		room_string_obj = obj;
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+				if(obj[i].room_active_yn == "Y"){
+					room_string += '<option value="'+obj[i].room_id+'">'+obj[i].room_name+'</option>';
+				}
+			}
+			room_string += '</select></div>';
+			loadlearningsignaldata(true,"ok;");
+		}
+	}
+}
+//load roomdata in dropdown
+
+var temp_alldata = "[";
+var lrn_idstring = "";
+/* load learning signals of sensors on page*/
+function loadlearningsignaldata(bool,response){
+	if(bool){
+		pagename = "get_learning";
+		if(lrn_idstring.length > 0){
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&lrnid="+lrn_idstring;
+		}
+		else{
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&lrnid="+0;
+		}
+		ajax_request(true,pagename,data_parameters,loadlearningsignaldata);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		var str = "";
+		var dataobj = "";
+		if(obj[0].status != "N"){// if for check object status is N
+			if(obj[0].therm_id != 0){
+				if(temp_alldata.length > 1){
+					temp_alldata = temp_alldata.substring(0,temp_alldata.length - 1);
+					temp_alldata = temp_alldata+"]";
+					dataobj = JSON.parse(temp_alldata);
+				}
+				var str = "";
+				var flag = 0;
+				var flag2 = 0;
+				temp_alldata = "[";
+				lrn_idstring = "";
+				for(var i = 0; i < obj.length; i++){
+					flag2 = 0;
+					lrn_idstring += obj[i].lrn_id+",";
+					if(dataobj.length > 0){
+						
+						for(var j = 0; j < dataobj.length; j++){
+							if(dataobj[j].sensor_id == obj[i].sensor_id){
+								str += '<tr><td><input id="device_id'+i+'" type="hidden" value="'+obj[i].device_id+'">';
+								str += '<input id="sensor_type_id'+i+'" type="hidden" value="'+obj[i].sensor_type_id+'">';
+								str += '<input id="lrn_id'+i+'" type="hidden" value="'+obj[i].lrn_id+'">';
+								str += '<input id="sensor_id'+i+'" type="hidden" value="'+obj[i].sensor_id+'">'+obj[i].sensor_id+'</td><td>'+obj[i].sensor_type+'</td>';
+								str += '<td><div class="form-group has-feedback" id="devicenameerrorheader'+i+'"><input id="device_name'+i+'" disabled type="text" class="form-control" value="'+dataobj[j].device_name+'">';
+								str += '<span id="devicenameerror'+i+'"></span></div></td><td><div class="form-group"><select disabled class="form-control input-group-addon-withoutradius" id="room_id'+i+'">';
+									var room_string1 = "";
+									if(room_string_obj[0].status != "N"){
+										for(var k = 0; k < room_string_obj.length; k++){
+											if(room_string_obj[k].room_id == dataobj[j].room_id){
+												room_string1 += '<option value="'+room_string_obj[k].room_id+'" selected>'+room_string_obj[k].room_name+'</option>';
+											}
+											else{
+												room_string1 += '<option value="'+room_string_obj[k].room_id+'">'+room_string_obj[k].room_name+'</option>';
+											}
+										}
+									}		
+									room_string1 += '</select>'; 
+								str += room_string1+'</td><td><div class="form-group"><select class="form-control input-group-addon-withoutradius" disabled id="schedule_id'+i+'">';
+								
+								var schedule_string1 = "";
+								if(schedule_string_obj[0].status != "N"){
+									for(var k = 0; k < schedule_string_obj.length; k++){
+											if(schedule_string_obj[k].schedule_id == dataobj[j].schedule_id){
+												schedule_string1 += '<option value="'+schedule_string_obj[k].schedule_id+'" selected>'+schedule_string_obj[k].schedule_name+'</option>';
+											}
+											else{
+												schedule_string1 += '<option value="'+schedule_string_obj[k].schedule_id+'">'+schedule_string_obj[k].schedule_name+'</option>';
+											}
+									}
+								}
+								schedule_string1 += '</select>'; 
+								str += schedule_string1+'</td><td>&nbsp;&nbsp;&nbsp;<input id="checkbox_id'+i+'" value="'+i+'" type="checkbox" checked  onClick="storedataarray(this.value)"></td></tr>';
+								flag++;
+								flag2 = 1;
+								temp_alldata += '{"id":"'+userid+'","sensor_id":"'+obj[i].sensor_id+'","device_name":"'+dataobj[j].device_name+'","schedule_id":"'+dataobj[j].schedule_id+'","device_id":"'+obj[i].device_id+'","lrn_id":"'+obj[i].lrn_id+'","sloc_id":"'+slocid+'","org_id":"'+orgid+'","therm_id":"'+thermid+'","user_id":"'+userid+'","sensor_type":"'+dataobj[j].sensor_type_id+'","checkbox_id":"checkbox_id'+i+'"},';
+								//alert("length:"+i);
+							}//close if for sensor compare
+						}//close for loop for dataobj length
+						if(flag < obj.length && flag2==0){
+							str += '<tr><td><input id="device_id'+i+'" type="hidden" value="'+obj[i].device_id+'">';
+							str += '<input id="sensor_type_id'+i+'" type="hidden" value="'+obj[i].sensor_type_id+'">';
+							str += '<input id="lrn_id'+i+'" type="hidden" value="'+obj[i].lrn_id+'">';
+							str += '<input id="sensor_id'+i+'" type="hidden" value="'+obj[i].sensor_id+'">'+obj[i].sensor_id+'</td><td>'+obj[i].sensor_type+'</td>';
+							str += '<td><div class="form-group has-feedback" id="devicenameerrorheader'+i+'"><input id="device_name'+i+'" type="text" class="form-control">';
+							str += '<span id="devicenameerror'+i+'"></span></div></td><td><div class="form-group"><select class="form-control input-group-addon-withoutradius" id="room_id'+i+'">';
+								var room_string1 = "";
+								if(room_string_obj[0].status != "N"){
+									for(var k = 0; k < room_string_obj.length; k++){
+										room_string1 += '<option value="'+room_string_obj[k].room_id+'">'+room_string_obj[k].room_name+'</option>';
+									}
+								}		
+								room_string1 += '</select>'; 
+							str += room_string1+'</td><td><div class="form-group"><select class="form-control input-group-addon-withoutradius" id="schedule_id'+i+'">';
+								var schedule_string1 = "";
+								if(schedule_string_obj[0].status != "N"){
+									for(var k = 0; k < schedule_string_obj.length; k++){
+										schedule_string1 += '<option value="'+schedule_string_obj[k].schedule_id+'">'+schedule_string_obj[k].schedule_name+'</option>';
+									}
+								}
+								schedule_string1 += '</select>'; 
+							str += schedule_string1+'</td><td>&nbsp;&nbsp;&nbsp;<input id="checkbox_id'+i+'" value="'+i+'" type="checkbox" onClick="storedataarray(this.value)"></td></tr>';
+							flag++;
+						}
+					}//close if for dataobject length
+					else{
+						
+						str += '<tr><td><input id="device_id'+i+'" type="hidden" value="'+obj[i].device_id+'">';
+						str += '<input id="sensor_type_id'+i+'" type="hidden" value="'+obj[i].sensor_type_id+'">';
+						str += '<input id="lrn_id'+i+'" type="hidden" value="'+obj[i].lrn_id+'">';
+						str += '<input id="sensor_id'+i+'" type="hidden" value="'+obj[i].sensor_id+'">'+obj[i].sensor_id+'</td><td style="width:170px;">';
+						str += '<img src="images/Icon/'+obj[i].sensor_type_id+'.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_type+'</td>';
+						str += '<td><div class="form-group has-feedback" id="devicenameerrorheader'+i+'"><input id="device_name'+i+'" type="text" class="form-control">';
+						str += '<span id="devicenameerror'+i+'"></span><span id="devicenameerrormessage'+i+'" style="display:none;" class="help-block">Please fill out this field</span>';
+						str += '</div></td ><td><div class="form-group"><select class="form-control input-group-addon-withoutradius" id="room_id'+i+'">'+room_string;
+						str += '</div></td ><td><div class="form-group"><select class="form-control input-group-addon-withoutradius" id="schedule_id'+i+'">'+schedule_string;
+						str += '</td><td>&nbsp;&nbsp;&nbsp;<input id="checkbox_id'+i+'" title="Configure" value="'+i+'" type="checkbox" onClick="storedataarray(this.value)"></td></tr>';
+					}// close else
+				}// close for loop for dataobject length
+				$('#learningdatatable').dataTable().fnDestroy();
+				lrn_idstring = lrn_idstring.substring(0,lrn_idstring.length - 1);
+				document.getElementById("learningdataload").innerHTML = str;
+				$('#learningdatatable').dataTable({"bPaginate": false,  "bSort": false, "bStateSave": true, "searching": false});
+			}//close if of if therm_id is = 0
+		}//close first outer if 
+		else{
+			temp_alldata = "[";
+			lrn_idstring = 0;
+			$('#learningdatatable').dataTable().fnDestroy();
+			str = '<tr><td></td><td></td><td>No Learning Signals</td><td></td><td></td><td></td></tr>';
+			document.getElementById("learningdataload").innerHTML = str;
+			$('#learningdatatable').dataTable({"bPaginate": false,  "bSort": false, "bStateSave": true, "searching": false});
+		}
+	}
+}
+
+/* end learning signals of sensors on page*/
+
+function storedataarray(id){
+	var sensor_id = $("#sensor_id"+id).val();
+	var device_name = $("#device_name"+id).val();
+	var room_id = $("#room_id"+id).val();
+	var schedule_id = $("#schedule_id"+id).val();
+	var checkbox_id = "checkbox_id"+id;
+	var device_id = $("#device_id"+id).val();
+	
+	var lrn_id = $("#lrn_id"+id).val();
+	var sensor_type_id = $("#sensor_type_id"+id).val();
+	
+	document.getElementById("devicenameerror"+id).className = "glyphicon form-control-feedback";
+	document.getElementById("devicenameerrorheader"+id).className = "form-group has-feedback";
+	//document.getElementById("devicenameerrormessage"+id).style.display = 'none';
+	
+	if(device_name == ""){
+		//document.getElementById("devicenameerrormessage"+id).style.display = 'block';
+		document.getElementById("devicenameerror"+id).className = "glyphicon glyphicon-remove form-control-feedback";
+		document.getElementById("devicenameerrorheader"+id).className = "form-group has-feedback has-error";
+		document.getElementById(checkbox_id).checked = false;
+	}
+	else{
+		if(document.getElementById(checkbox_id).checked){
+			temp_alldata += '{"id":"'+userid+'","sensor_id":"'+sensor_id+'","device_name":"'+device_name+'","roomid":"'+room_id+'","schedule_id":"'+schedule_id+'","device_id":"'+device_id+'","lrn_id":"'+lrn_id+'","sloc_id":"'+slocid+'","org_id":"'+orgid+'","therm_id":"'+thermid+'","user_id":"'+userid+'","sensor_type":"'+sensor_type_id+'","checkbox_id":"'+checkbox_id+'"},';
+			$("#device_name"+id).attr("disabled", "disabled");
+			$("#schedule_id"+id).attr("disabled", "disabled"); 
+			$("#room_id"+id).attr("disabled", "disabled"); 
+		}
+		else
+		{
+			$("#device_name"+id).removeAttr("disabled"); 
+			$("#schedule_id"+id).removeAttr("disabled");
+			if(temp_alldata.length > 1){
+				temp_alldata = temp_alldata.substring(0,temp_alldata.length - 1);
+				temp_alldata = temp_alldata+"]";
+				
+				var dataobj = JSON.parse(temp_alldata);
+				if(dataobj.length > 0){
+					temp_alldata = "[";
+					for(var j = 0; j < dataobj.length; j++){
+						if(dataobj[j].sensor_id == sensor_id){
+						}
+						else{
+							temp_alldata += '{"id":"'+userid+'","sensor_id":"'+dataobj[j].sensor_id+'","device_name":"'+dataobj[j].device_name+'","roomid":"'+dataobj[j].room_id+'","schedule_id":"'+dataobj[j].schedule_id+'","device_id":"'+dataobj[j].device_id+'","lrn_id":"'+dataobj[j].lrn_id+'","sloc_id":"'+slocid+'","org_id":"'+orgid+'","therm_id":"'+thermid+'","user_id":"'+userid+'","sensor_type":"'+dataobj[j].sensor_type_id+'","checkbox_id":"'+checkbox_id+'"},';
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function configuresensor(bool,response){
+	if(bool){
+		if(temp_alldata.length > 1){
+			temp_alldata = temp_alldata.substring(0,temp_alldata.length - 1);
+			temp_alldata += "]";
+			pagename = "sensor";
+			var data_parameters = temp_alldata;
+			ajax_request(true,pagename,data_parameters,configuresensor);
+		}
+		else{
+			$('#selectdevicewarningalert').modal({
+			keyboard: true 
+		});
+		}
+	}else{
+		$('#configuresuccesssalert').modal({
+			keyboard: true 
+		});
+		loadlearningsignaldata(true,"ok");
+	}
+}
+
+
+function clearalldeviceconfirm(){
+	if(lrn_idstring.length > 0){
+		$('#signalclearconfirm').modal({
+			keyboard: true 
+		});
+	}
+	else{
+		$('#nocleardevicewarningalert').modal({
+			keyboard: true 
+		});
+	}
+}
+
+function clearalldevice(bool,response){
+	if(bool){
+		$('#signalclearconfirm').modal('hide');
+		pagename = "clear_learning";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid;
+		ajax_request(true,pagename,data_parameters,clearalldevice);
+	}else{
+		var obj = JSON.parse(response);
+		$('#learningsuccesssalert').modal({
+			keyboard: true 
+		});
+		loadlearningsignaldata(true,"ok");
+	}
+}
+
+</script>
+
+<div class="container" style="margin-top:0px;">
+    <div class="row"><br/>
+    	<div  id="loadlearningsdata" class="col-sm-12">
+        	<div class="span12">      
+                <table id="learningdatatable" class="table table-hover table-fixed-header">
+                   <thead>
+                      <tr>
+							<th>Device ID</th><th>Type</th><th>Device</th><th>Room</th><th>Schedule</th><th>Action</th>
+                      </tr>
+                   </thead>
+                   <tbody id="learningdataload">
+                   </tbody>
+                 </table>   
+              </div>
+          </div>
+            <div class="form-group col-sm-5" style="float:right">         
+                <button  class="btn-exit" style="width:48%" onClick="clearalldeviceconfirm()">Clear all</button>
+                <button id="editlocationdate" class="btn-adddetail" style="width:49%" onClick="configuresensor(true,'ok')">Configure</button>
+            </div>
+            
+            
+        <!-- ===============Confirm box============-->
+        <div id="signalclearconfirm" class="modal fade" style="margin-top:0px; border-radius:0px;">
+           <div class="modal-dialog">
+               <div class="modal-content" style="border-radius:0px;">
+                    <div class="modal-header alert-modal-success" >
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <input type="hidden" id="confirmuserid"><input type="hidden" id="confirmlocid">
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure?</p>
+                       <!-- <p class="text-warning"><small>If you don't save, your changes will be lost.</small></p>-->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onClick="clearalldevice('true','ok')">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ===============Confirm box============-->   
+
+        <!-- ===============no device to clear============-->
+        <div id="nocleardevicewarningalert" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info alert-modal-success">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Warning</h4>
+                    </div>
+                    <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+                        <div class="container">
+                            No Device to clear.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- ===============no device to clear============-->
+        
+        <!-- ===============select device alert============-->
+        <div id="selectdevicewarningalert" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info alert-modal-success">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Warning</h4>
+                    </div>
+                    <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+                        <div class="container">
+                            Please select device.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- ===============select device alert============-->
+        
+        <!-- ===============Clear all devices succefull============-->
+    	<div id="learningsuccesssalert" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info alert-modal-success">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Success</h4>
+                    </div>
+                    <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+                        <div class="container">
+                            Devices removed successfully.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+    	</div>
+        <!-- ===============Clear all devices succefull============-->
+        
+        <!-- ===============configure devices alert============-->
+    	<div id="configuresuccesssalert" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-info alert-modal-success">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Success</h4>
+                    </div>
+                    <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+                        <div class="container">
+                            Devices configured successfully.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+    	</div>
+        <!-- ===============configure devices alert============-->
+
+	</div>
+</div>
+</body>
+<script>
+loadschedulestring(true,"ok");
+var timmerforlearning = setInterval(function(){ loadlearningsignaldata(true,"ok"); }, 7000);
+</script>
+</html>
+ 

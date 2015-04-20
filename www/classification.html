@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row"><br/>
+    	<div id="addCategorydiv1"> 
+        <div id="addCategorydiv" class="col-sm-3" style="border:1px solid #CCC;">
+        	<h4><b>Add New Classification</b></h4><hr>
+            	<div id="Locationalertsuccess" class="span4 pull-center" style="display:none;">
+        			<div class="alert alert-success fade">
+        			<strong>Success! </strong> Category added successfully.
+    				</div>
+                </div>
+                
+                <div class="form-group has-feedback" id="parentclassification">
+                    <label for="inputError2">Parent Classification</label>
+                    <select id="parent_classification_id" class="form-control select-box-drop">
+                    </select>
+                </div>
+                
+            	<div id="Categorynameerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Classification Name</label>
+                     <input type="text" class="form-control" id="Categoryname">
+                     <input type="hidden" id="Categorynamevalidatecheck" \>
+                     <span id="Categorynameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="Categorynamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="Categorynamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="Categorynamewarning" style="display:none;" class="help-block">Name already exists.</span>
+				</div>
+				<button onClick="saveCategory(true,Categoryname.value)" type="button" id="Categoryaddbutton" class="all-btn-custom btn-sm btn-block ">
+          			<span class="glyphicon glyphicon-plus"></span> ADD
+        		</button>
+         		<br />
+        </div>
+        
+        
+        
+        <div id="editaddCategorydiv" class="col-sm-3" style="border:1px solid #CCC; display:none;">
+        	<h4><b>Edit Classification</b></h4><hr>
+            	
+                <div class="form-group has-feedback" id="editparentclassification">
+                    <label for="inputError2">Parent Classification</label>
+                    <select id="editparent_classification_id" class="form-control select-box-drop">
+                    </select>
+                </div>
+                
+            	<div id="editCategorynameerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Classification Name</label>
+                     <input type="text" class="form-control" id="editCategoryname">
+                     <input type="hidden" id="editCategorynamevalidatecheck" \>
+                     <input type="hidden" id="editCategoryid" \>
+                     <span id="editCategorynameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="editCategorynamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="editCategorynamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="editCategorynamewarning" style="display:none;" class="help-block">Name already exists.</span>
+                     <br/>
+                     <b>Active</b> <input type="checkbox" id="classificationactiveyn" checked />
+				</div>
+				<div class="form-group">         
+          			<button  class="btn-exit" style="width:49%" onClick="hideeditclassificationdiv()">Exit</button>
+                    <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="saveedivclassificationdiv(true,editCategoryname.value)">Update</button>
+          		</div>
+         		<br />
+        </div>
+        
+        
+<!-- ===============Add Category Success============-->
+<div id="Categoryaddsucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Classification added successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Add Category Success============-->
+
+
+<!-- ===============update Category Success============-->
+<div id="updateCategoryaddsucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Classification updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============update Category Success============-->
+
+
+        <div  id="loadCategorydetaildata" class="col-sm-9">
+        <table id="Categorydatatable" class="table table-hover">
+           <thead>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Classification List</h4>
+                    </div>
+                </div>
+              <tr>
+                 <th>Classification</th><th>Parent Classification</th><th>Modified By</th><th>Modified On</th><th>Action</th>
+              </tr>
+           </thead>
+           <tbody id="Categorydataload">
+          		
+           </tbody>
+         </table>   
+        </div>
+        </div>
+        
+<!-- ===============Category Detail Success============-->
+<div id="categorydtsucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Detail added successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Category Detail Success============-->
+
+<!-- ===============Update CategoryDetail Success============-->
+<div id="classifiationdtupdatesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Detail updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Update CategoryDetail Success============-->
+
+<!--===================Edit Detail In Classification================================ -->      
+		<div id="editdetailcategorydiv1" style="display:none;">
+        <div id="editdetailschedulediv" class="col-sm-3" style="border:1px solid #CCC;">
+        	<h4><b>Edit Classification Detail</b></h4><hr>
+            	<div id="scheduledetailalertsuccess" class="span4 pull-center" style="display:none;">
+        			<div class="alert1 alert-success fade">
+        			<strong>Success! </strong> Detail added successfully.
+    				</div>
+                </div>
+            	<div id="editcategorynameerrorheader" class="form-group has-feedback">
+                	<input type="hidden" id="editcategorydetail_id">
+                    <input type="hidden" id="editcategorydetail_id1">
+                	<input type="text" class="form-control" id="editcategorydetailname" disabled>
+                    <br/>
+                </div>
+                <div id="editcategorydetailnameerrorheader" class="form-group has-feedback">
+                    <label for="inputError2">Classification Description</label>
+                    <input type="text" class="form-control" id="editcategorydetaildescription">
+                    <span id="editcategorydetailerror2" style="display:none;" class="help-block">Please fill out this field</span>
+                    <span id="editcategorydetailsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                    <span id="editcategorydetailwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                    <span id="editcategorydetailwarning" style="display:none;" class="help-block">Name already exists</span>
+                </div>
+                <div class="form-group">         
+          			<button  class="btn-exit" style="width:49%" onClick="editcategorydetailhide()">Back</button>
+                    <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="editsaveclassificationdetatil(true,editcategorydetaildescription.value)">Update</button>
+          		</div>
+				
+        </div>
+        
+       	</div>
+<!--===================Edit Detail In Classification================================ -->    
+
+<!--===================Add Detail In Classification================================ -->
+		<div id="adddetailcategorydiv1" style="display:none;">
+        <div id="adddetailschedulediv" class="col-sm-3" style="border:1px solid #CCC;">
+        	<h4><b>Add Classification Detail</b></h4><hr>
+            	<div id="scheduledetailalertsuccess" class="span4 pull-center" style="display:none;">
+        			<div class="alert1 alert-success fade">
+        			<strong>Success! </strong> Detail added successfully.
+    				</div>
+                </div>
+            	<div id="categorydetailnameerrorheader" class="form-group has-feedback">
+                	<input type="hidden" id="categorydetail_id">
+                	<input type="text" class="form-control" id="categorydetailname" disabled>
+                    <br/>
+                </div>
+                <div id="categorydetailnameerrorheader1" class="form-group has-feedback">
+                    <label for="inputError2">Classification Description</label>
+                    <input type="text" class="form-control" id="categorydetaildescription">
+                    <span id="categorydetailerror2" style="display:none;" class="help-block">Please fill out this field</span>
+                    <span id="categorydetailsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                    <span id="categorydetailwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                    <span id="categorydetailwarning" style="display:none;" class="help-block">Name already exists</span>
+                </div>
+                <div class="form-group">        
+          			<button  class="btn-exit" style="width:49%" onClick="hidecategorydiv()">Exit</button>
+                    <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="savecategorydetatil(true,categorydetaildescription.value)">Add Detail</button>
+          		</div>
+				
+        </div>
+        
+        
+        <div  id="loadgroupdata" class="col-sm-9">
+        <table id="categorydetaildatatable" class="table table-hover">
+           <thead>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Classification Description List</h4>
+                    </div>
+                </div>
+              <tr>
+                 <th>Classification Description</th><th>Modified By</th><th>Modified On</th><th>Action</th>
+              </tr>
+           </thead>
+           <tbody id="categorydetaildataload">
+          		
+           </tbody>
+         </table>   
+        </div>
+        </div>
+<!--===================Add Detail In Classification================================ -->         
+   </div>
+</div>
+</body>
+<script src="js/classification.js"></script>
+<script>
+loadcategorydata(true,"ok");
+</script>
+</html>

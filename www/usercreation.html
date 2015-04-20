@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+<script>
+
+function loaduserdata(bool,response){
+	if(bool){
+		pagename = "get_user";
+		var flag = "S";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&username="+""+ "&flag="+flag+ "&userid="+0;
+		ajax_request(true,pagename,data_parameters,loaduserdata);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0,j = 1; i < obj.length; i++,j++){
+				var type = "";
+				if(obj[i].user_type == "A"){
+					type = "Administrator";
+				}
+				else{
+					type = "User";
+				}
+				str += '<tr><td>'+obj[i].username+'</td><td>'+obj[i].uml_email_id+'</td><td>'+type+'</td><td>'+obj[i].modified_by+'</td><td>'+obj[i].mod_dt+'</td><td>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-edit" style="cursor:pointer" title="Edit" onClick="hideshowdivuser(\''+obj[i].user_id+'\',\''+obj[i].username+'\',\''+obj[i].uml_email_id+'\',\''+obj[i].user_phone+'\',\''+obj[i].user_type+'\',\''+obj[i].user_actve+'\')"></span></td></tr>';	
+			}
+			document.getElementById("userdataload").innerHTML = str;
+			
+			if(obj.length > 7)$('#userdatatable').dataTable({"bPaginate": true, "bLengthChange": false, "iDisplayLength":7});
+			else $('#userdatatable').dataTable({"bPaginate": false});
+		}
+	}
+}
+
+
+function saveuser(bool,response){
+	document.getElementById("usernameerror").style.display = 'none';
+	document.getElementById("usernameerrorheader").className = 'form-group has-feedback';
+	document.getElementById("passworderror").style.display = 'none';
+	document.getElementById("passworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("cpassworderror").style.display = 'none';
+	document.getElementById("cpassworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("emailerror").style.display = 'none';
+	document.getElementById("emailerrorheader").className = 'form-group has-feedback';
+	document.getElementById("phonenoerror").style.display = 'none';
+	document.getElementById("phonenoerrorheader").className = 'form-group has-feedback';
+	document.getElementById("usernamesuccessicon").style.display = 'none';
+	document.getElementById("emailsuccessicon").style.display = 'none';
+	
+	document.getElementById("notmatchwarning").style.display = 'none';
+	document.getElementById("passwordwarningicon").style.display = 'none';
+	document.getElementById("cpasswordwarningicon").style.display = 'none';
+	document.getElementById("notvalidemail").style.display = 'none';
+	document.getElementById("notvalidphoneno").style.display = 'none';
+		
+	if(bool){
+		var username = document.getElementById("username").value;
+		var password = document.getElementById("password").value;
+		var cpassword = document.getElementById("cpassword").value;
+		var email = document.getElementById("emailname").value;
+		var phoneno = document.getElementById("phoneno").value;
+		var usertype = document.getElementById("userpreferences").value;
+		
+		if(username != "" && password != "" && cpassword != "" && phoneno != "" && email != ""){
+			var usernamevalidate = document.getElementById("usernamevalidatecheck").value;
+			var emailvalidate = document.getElementById("emailvalidatecheck").value;
+			
+			if(usernamevalidate.trim() != "Y" && emailvalidate.trim() != "Y"){
+				var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z\-])+\.)+([a-zA-Z]{2,4})+$/;
+				if(filter.test(email))
+				{
+					var filtermobile = /^[1-9]{1}[0-9]{9}$/;
+				 	if(filtermobile.test(phoneno)){
+						if(password == cpassword){
+							pagename = "user";
+							flag = "A";
+							useractiveyn = "Y";
+							var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&username="+username+ "&emailid="+email+ "&password="+password+ "&usertype="+usertype+ "&phoneno="+phoneno+ "&useractive="+useractiveyn+ "&userid="+0+ "&id="+userid+ "&flag="+flag;
+							ajax_request(true,pagename,data_parameters,saveuser);
+						}
+						else{
+							document.getElementById("notmatchwarning").style.display = 'block';
+							document.getElementById("passworderrorheader").className = 'form-group has-feedback has-warning';
+							document.getElementById("cpassworderrorheader").className = 'form-group has-feedback has-warning';
+							document.getElementById("passwordwarningicon").style.display = 'block';
+							document.getElementById("cpasswordwarningicon").style.display = 'block';
+						}
+					}
+					else{
+						document.getElementById("notvalidphoneno").style.display = 'block';
+						document.getElementById("phonenoerrorheader").className = 'form-group has-feedback has-error';
+					}
+				}
+				else{
+					document.getElementById("notvalidemail").style.display = 'block';
+					document.getElementById("emailerrorheader").className = 'form-group has-feedback has-error';
+				}
+			}
+		}else{
+			if(username == ""){
+				document.getElementById("usernameerror").style.display = 'block';
+				document.getElementById("usernameerrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(password == ""){
+				document.getElementById("passworderror").style.display = 'block';
+				document.getElementById("passworderrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(cpassword == ""){
+				document.getElementById("cpassworderror").style.display = 'block';
+				document.getElementById("cpassworderrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(email == ""){
+				document.getElementById("emailerror").style.display = 'block';
+				document.getElementById("emailerrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(phoneno == ""){
+				document.getElementById("phonenoerror").style.display = 'block';
+				document.getElementById("phonenoerrorheader").className = 'form-group has-feedback has-error';
+			}
+		}
+	}else{
+		var obj = JSON.parse(response);
+		if(obj[0].status == "N"){
+			//document.getElementById("thermostatalertsuccess").style.display = "block";
+		}else{
+			$('#userform')[0].reset();
+			$('#usercreatinsuccesssalert').modal({keyboard: true});
+			$('#userdatatable').dataTable().fnDestroy();
+			loaduserdata(true,"ok");
+		}
+	}
+}
+
+
+function editsaveuser(bool,response){
+	document.getElementById("editusernameerror").style.display = 'none';
+	document.getElementById("editusernameerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editpassworderror").style.display = 'none';
+	document.getElementById("editpassworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("editcpassworderror").style.display = 'none';
+	document.getElementById("editcpassworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("editemailerror").style.display = 'none';
+	document.getElementById("editemailerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editphonenoerror").style.display = 'none';
+	document.getElementById("editphonenoerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editusernamesuccessicon").style.display = 'none';
+	document.getElementById("editemailsuccessicon").style.display = 'none';
+	
+	document.getElementById("editnotmatchwarning").style.display = 'none';
+	document.getElementById("editpasswordwarningicon").style.display = 'none';
+	document.getElementById("editcpasswordwarningicon").style.display = 'none';
+	document.getElementById("editnotvalidemail").style.display = 'none';
+	document.getElementById("editnotvalidphoneno").style.display = 'none';
+		
+	if(bool){
+		var username = document.getElementById("editusername").value;
+		var password = document.getElementById("editpassword").value;
+		var cpassword = document.getElementById("editcpassword").value;
+		var email = document.getElementById("editemailname").value;
+		var phoneno = document.getElementById("editphoneno").value;
+		var usertype = document.getElementById("edituserpreferences").value;
+		
+		if(username != "" && password != "" && cpassword != "" && phoneno != "" && email != ""){
+			var usernamevalidate = document.getElementById("editusernamevalidatecheck").value;
+			var emailvalidate = document.getElementById("editemailvalidatecheck").value;
+			
+			if(emailvalidate.trim() != "Y"){
+				var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z\-])+\.)+([a-zA-Z]{2,4})+$/;
+				if(filter.test(email))
+				{
+					var filtermobile = /^[1-9]{1}[0-9]{9}$/;
+				 	if(filtermobile.test(phoneno)){
+						if(password == cpassword){
+							if(document.getElementById("useractiveyn").checked){
+								locactiveyn = "Y";
+							}
+							else locactiveyn = "N";
+							
+							var edituserid = document.getElementById("edituserid").value;
+							pagename = "user";
+							flag = "E";
+							var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&username="+username+ "&emailid="+email+ "&password="+password+ "&usertype="+usertype+ "&phoneno="+phoneno+ "&useractive="+locactiveyn+ "&userid="+edituserid+ "&id="+userid+ "&flag="+flag;
+							ajax_request(true,pagename,data_parameters,editsaveuser);
+						}
+						else{
+							document.getElementById("editnotmatchwarning").style.display = 'block';
+							document.getElementById("editpassworderrorheader").className = 'form-group has-feedback has-warning';
+							document.getElementById("editcpassworderrorheader").className = 'form-group has-feedback has-warning';
+							document.getElementById("editpasswordwarningicon").style.display = 'block';
+							document.getElementById("editcpasswordwarningicon").style.display = 'block';
+						}
+					}
+					else{
+						document.getElementById("editnotvalidphoneno").style.display = 'block';
+						document.getElementById("editphonenoerrorheader").className = 'form-group has-feedback has-error';
+					}
+				}
+				else{
+					document.getElementById("editnotvalidemail").style.display = 'block';
+					document.getElementById("editemailerrorheader").className = 'form-group has-feedback has-error';
+				}
+			}
+		}else{
+			if(username == ""){
+				document.getElementById("editusernameerror").style.display = 'block';
+				document.getElementById("editusernameerrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(password == ""){
+				document.getElementById("editpassworderror").style.display = 'block';
+				document.getElementById("editpassworderrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(cpassword == ""){
+				document.getElementById("editcpassworderror").style.display = 'block';
+				document.getElementById("editcpassworderrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(email == ""){
+				document.getElementById("editemailerror").style.display = 'block';
+				document.getElementById("editemailerrorheader").className = 'form-group has-feedback has-error';
+			}
+			if(phoneno == ""){
+				document.getElementById("editphonenoerror").style.display = 'block';
+				document.getElementById("editphonenoerrorheader").className = 'form-group has-feedback has-error';
+			}
+		}
+	}else{
+		var obj = JSON.parse(response);
+		if(obj[0].status == "N"){
+			//document.getElementById("thermostatalertsuccess").style.display = "block";
+		}else{
+			$('#userupdatesucess').modal({
+				keyboard: true 
+			});
+			document.getElementById("adduserdiv").style.display = 'block';
+			document.getElementById("edituserdiv").style.display = 'none';
+			$('#userdatatable').dataTable().fnDestroy();
+			loaduserdata(true,"ok");
+		}
+	}
+}
+
+
+function checkusername(bool,response){
+	document.getElementById("usernameerror").style.display = 'none';
+	document.getElementById("usernamesuccessicon").style.display = 'none';
+	document.getElementById("usernamewarningicon").style.display = 'none';
+	document.getElementById("usernamewarning").style.display = 'none';
+	document.getElementById("usernameerrorheader").className = 'form-group has-feedback';
+	
+	if(response.length > 0){
+		if(bool){
+			pagename = "user_exists";
+			flag = "A";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&id="+userid+ "&username="+response+ "&flag="+flag;
+			ajax_request(true,pagename,data_parameters,checkusername);
+		}else{
+			var obj = JSON.parse(response);
+			document.getElementById("usernamevalidatecheck").value = obj[0].status;
+			if(obj[0].status == "Y"){
+				document.getElementById("usernamewarning").style.display = 'block';
+				document.getElementById("usernamewarningicon").style.display = 'block';
+				document.getElementById("usernameerrorheader").className = 'form-group has-feedback has-warning';
+			}else{
+				document.getElementById("usernamesuccessicon").style.display = 'block';
+				document.getElementById("usernameerrorheader").className = 'form-group has-feedback has-success ';
+			}
+		}
+	}
+}
+
+
+function checkemail(bool,response){
+	document.getElementById("emailerror").style.display = 'none';
+	document.getElementById("emailsuccessicon").style.display = 'none';
+	document.getElementById("emailwarningicon").style.display = 'none';
+	document.getElementById("emailwarning").style.display = 'none';
+	document.getElementById("emailerrorheader").className = 'form-group has-feedback';
+	document.getElementById("notvalidemail").style.display = 'none';
+	
+	if(response.length > 0){
+		if(bool){
+			pagename = "email_exists";
+			flag = "A";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&id="+userid+ "&emailid="+response+ "&flag="+flag;
+			ajax_request(true,pagename,data_parameters,checkemail);
+		}else{
+			var obj = JSON.parse(response);
+			document.getElementById("emailvalidatecheck").value = obj[0].status;
+			if(obj[0].status == "Y"){
+				document.getElementById("emailwarning").style.display = 'block';
+				document.getElementById("emailwarningicon").style.display = 'block';
+				document.getElementById("emailerrorheader").className = 'form-group has-feedback has-warning';
+			}else{
+				document.getElementById("emailsuccessicon").style.display = 'block';
+				document.getElementById("emailerrorheader").className = 'form-group has-feedback has-success ';
+			}
+		}
+	}
+}
+
+function hideshowdivuser(userid,username,email,userph,usertype,useractive){ 
+	if(useractive == "N")document.getElementById("useractiveyn").checked = false;
+	else document.getElementById("useractiveyn").checked = true;
+	
+	document.getElementById("adduserdiv").style.display = 'none';
+	document.getElementById("edituserdiv").style.display = 'block';
+	
+	document.getElementById("edituserid").value = userid;
+	document.getElementById("editusername").value = username;
+	document.getElementById("editpassword").value = "";
+	document.getElementById("editcpassword").value = "";
+	document.getElementById("editemailname").value = email;
+	document.getElementById("editphoneno").value = userph;
+	document.getElementById("edituserpreferences").value = usertype;
+	
+	document.getElementById("editusernameerror").style.display = 'none';
+	document.getElementById("editusernameerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editpassworderror").style.display = 'none';
+	document.getElementById("editpassworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("editcpassworderror").style.display = 'none';
+	document.getElementById("editcpassworderrorheader").className = 'form-group has-feedback';
+	document.getElementById("editemailerror").style.display = 'none';
+	document.getElementById("editemailerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editphonenoerror").style.display = 'none';
+	document.getElementById("editphonenoerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editusernamesuccessicon").style.display = 'none';
+	document.getElementById("editemailsuccessicon").style.display = 'none';
+}
+
+function exituserdivhide(){
+	document.getElementById("adduserdiv").style.display = 'block';
+	document.getElementById("edituserdiv").style.display = 'none';
+}
+
+
+function editcheckemail(bool,response){
+	document.getElementById("editemailerror").style.display = 'none';
+	document.getElementById("editemailsuccessicon").style.display = 'none';
+	document.getElementById("editemailwarningicon").style.display = 'none';
+	document.getElementById("editemailwarning").style.display = 'none';
+	document.getElementById("editemailerrorheader").className = 'form-group has-feedback';
+	document.getElementById("editnotvalidemail").style.display = 'none';
+	
+	if(response.length > 0){
+		if(bool){
+			var username = document.getElementById("editusername").value;
+			pagename = "email_exists";
+			flag = "E";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&id="+userid+ "&emailid="+response+ "&username="+username+ "&flag="+flag;
+			ajax_request(true,pagename,data_parameters,editcheckemail);
+		}else{
+			var obj = JSON.parse(response);
+			document.getElementById("editemailvalidatecheck").value = obj[0].status;
+			if(obj[0].status == "Y"){
+				document.getElementById("editemailwarning").style.display = 'block';
+				document.getElementById("editemailwarningicon").style.display = 'block';
+				document.getElementById("editemailerrorheader").className = 'form-group has-feedback has-warning';
+			}else{
+				document.getElementById("editemailsuccessicon").style.display = 'block';
+				document.getElementById("editemailerrorheader").className = 'form-group has-feedback has-success ';
+			}
+		}
+	}
+}
+
+
+
+</script>
+</head>
+<body>
+<div class="container">
+    <div class="row"><br/>
+    	<div id="addthermostatdiv1"> 
+        <div id="adduserdiv" class="col-sm-3" style="border:1px solid #CCC;">
+        	<h4><b>Add New User</b></h4><hr>
+            	<div id="useraddalertsuccess" class="span4 pull-center" style="display:none;">
+        			<div class="alert alert-success fade">
+        			<strong>Success! </strong> User added successfully.
+    				</div>
+                </div>
+                
+                <!--username-->
+                <form id="userform">
+               	<div id="usernameerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Username</label>
+                     <input type="text" class="form-control" id="username" onKeyUp="checkusername(true,this.value)">
+                     <input type="hidden" id="usernamevalidatecheck" \>
+                     <span id="usernameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="usernamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="usernamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="usernamewarning" style="display:none;" class="help-block">Username already exists.</span>
+				</div>
+                 <!--password-->
+            	<div id="passworderrorheader" class="form-group has-feedback">
+                <label for="inputError2">Password</label>
+                     <input type="password" class="form-control" id="password" >
+                     <input type="hidden" id="passwordvalidatecheck" \>
+                     <span id="passworderror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="passwordsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="passwordwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="passwordwarning" style="display:none;" class="help-block">Password not match.</span>
+				</div>
+				 <!--confirm password-->
+                <div id="cpassworderrorheader" class="form-group has-feedback">
+                <label for="inputError2">Confirm Password</label>
+                     <input type="password" class="form-control" id="cpassword">
+                     <input type="hidden" id="cpasswordvalidatecheck" \>
+                     <span id="cpassworderror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="cpasswordsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="cpasswordwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="cpasswordwarning" style="display:none;" class="help-block">Confirm password not match.</span>
+                     <span id="notmatchwarning" style="display:none;" class="help-block">Password & confirm password didn't match.</span>
+				</div>
+                 <!--Email-->
+                <div id="emailerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Email</label>
+                     <input type="text" class="form-control" id="emailname" onKeyUp="checkemail(true,this.value)">
+                     <input type="hidden" id="emailvalidatecheck" \>
+                     <span id="emailerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="notvalidemail" style="display:none;" class="help-block">Email id not valid.</span>
+                     <span id="emailsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="emailwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="emailwarning" style="display:none;" class="help-block">Email ID already exists.</span>
+				</div>
+                 <!--Phone Number-->
+                <div id="phonenoerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Phone Number</label>
+                     <input type="text" class="form-control" id="phoneno">
+                     <input type="hidden" id="phonenovalidatecheck" \>
+                     <span id="phonenoerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="notvalidphoneno" style="display:none;" class="help-block">Phone number not valid.</span>
+                     <span id="phonenosuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="phonenowarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="phonenowarning" style="display:none;" class="help-block">Thermostat ID not valid.</span>
+				</div>
+                 <!--User Type-->
+                <div class="form-group has-feedback" id="userpreferencesheader">
+                    <label for="inputError2">User Type</label>
+                    <select class="form-control" id="userpreferences" style="border-radius:0px;">
+                        <option value="A">Administrator</option>
+                        <option value="U">User</option>
+                    </select>
+                <span id="userpreferenceserror" style="display:none;" class="help-block">Please select location</span>
+            	</div>
+				<button onClick="saveuser(true,'ok')" type="button" id="thermostataddbutton" class="all-btn-custom btn-sm btn-block ">
+          			<span class="glyphicon glyphicon-plus"></span> ADD
+        		</button>
+                </form>
+         		<br />
+        </div>
+
+<!-- ===============user Added succefull============-->
+<div id="usercreatinsuccesssalert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info alert-modal-success">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    User added successfully.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============user Added succefull============-->   
+
+<!-- ===============Update Detail Success============-->
+<div id="userupdatesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					User updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Update Detail Success============-->  
+
+<!--  Edit Department  -->   
+<div id="edituserdiv" class="col-sm-3" style="border:1px solid #CCC; display:none">
+    <h4><b>Edit User</b></h4><hr>
+        <div id="editthermostatalertsuccess" class="span4 pull-center" style="display:none;">
+            <div class="alert alert-success fade">
+            <strong>Success! </strong> User added successfully.
+            </div>
+        </div>
+        
+        <!--username-->
+        <div id="editusernameerrorheader" class="form-group has-feedback">
+        <label for="inputError2">Username</label>
+             <input type="text" class="form-control" id="editusername" disabled>
+             <input type="hidden" class="form-control" id="edituserid" disabled>
+             <input type="hidden" id="editusernamevalidatecheck" \>
+             <span id="editusernameerror" style="display:none;" class="help-block">Please fill out this field</span>
+             <span id="editusernamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+             <span id="editusernamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+             <span id="editusernamewarning" style="display:none;" class="help-block">Username already exists.</span>
+        </div>
+         <!--password-->
+        <div id="editpassworderrorheader" class="form-group has-feedback">
+        <label for="inputError2">Password</label>
+             <input type="password" class="form-control" id="editpassword" >
+             <input type="hidden" id="editpasswordvalidatecheck" \>
+             <span id="editpassworderror" style="display:none;" class="help-block">Please fill out this field</span>
+             <span id="editpasswordsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+             <span id="editpasswordwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+             <span id="editpasswordwarning" style="display:none;" class="help-block">Password not match.</span>
+        </div>
+         <!--confirm password-->
+        <div id="editcpassworderrorheader" class="form-group has-feedback">
+        <label for="inputError2">Confirm Password</label>
+             <input type="password" class="form-control" id="editcpassword">
+             <input type="hidden" id="editcpasswordvalidatecheck" \>
+             <span id="editcpassworderror" style="display:none;" class="help-block">Please fill out this field</span>
+             <span id="editcpasswordsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+             <span id="editcpasswordwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+             <span id="editcpasswordwarning" style="display:none;" class="help-block">Confirm password not match.</span>
+             <span id="editnotmatchwarning" style="display:none;" class="help-block">Password & confirm password didn't match.</span>
+        </div>
+         <!--Email-->
+        <div id="editemailerrorheader" class="form-group has-feedback">
+        <label for="inputError2">Email</label>
+             <input type="text" class="form-control" id="editemailname" onKeyUp="editcheckemail(true,this.value)">
+             <input type="hidden" id="editemailvalidatecheck" \>
+             <span id="editemailerror" style="display:none;" class="help-block">Please fill out this field</span>
+             <span id="editnotvalidemail" style="display:none;" class="help-block">Email id not valid.</span>
+             <span id="editemailsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+             <span id="editemailwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+             <span id="editemailwarning" style="display:none;" class="help-block">Email ID already exists.</span>
+        </div>
+         <!--Phone Number-->
+        <div id="editphonenoerrorheader" class="form-group has-feedback">
+        <label for="inputError2">Phone Number</label>
+             <input type="text" class="form-control" id="editphoneno">
+             <input type="hidden" id="editphonenovalidatecheck" \>
+             <span id="editphonenoerror" style="display:none;" class="help-block">Please fill out this field</span>
+             <span id="editnotvalidphoneno" style="display:none;" class="help-block">Phone number not valid.</span>
+             <span id="editphonenosuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+             <span id="editphonenowarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+             <span id="editphonenowarning" style="display:none;" class="help-block">Thermostat ID not valid.</span>
+        </div>
+         <!--User Type-->
+        <div class="form-group has-feedback" id="userpreferencesheader">
+            <label for="inputError2">User Type</label>
+            <select class="form-control" id="edituserpreferences" style="border-radius:0px;">
+                <option value="A">Administrator</option>
+                <option value="U">User</option>
+            </select>
+        <span id="userpreferenceserror" style="display:none;" class="help-block">Please select location</span>
+        <br>
+        <b>Active</b> <input type="checkbox" id="useractiveyn" checked />
+        </div>
+       
+        
+        <div class="form-group">         
+            <button  class="btn-exit" style="width:49%" onClick="exituserdivhide()">Exit</button>
+            <button id="edituserbutton" class="btn-adddetail" style="width:49%" onClick="editsaveuser(true,'ok')">Update</button>
+        </div>
+</div>
+<!--  Edit Department  -->       
+ 
+        <div  id="loadthermostatdetaildata" class="col-sm-9">
+        <table id="userdatatable" class="table table-hover">
+           <thead>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>User List</h4>
+                    </div>
+                </div>
+              <tr>
+                 <th>Username</th><th>Email id</th><th>Usertype</th><th>Modified By</th><th>Modified On</th><th>Action</th>
+              </tr>
+           </thead>
+           <tbody id="userdataload">
+          		
+           </tbody>
+         </table>   
+        </div>
+        </div>
+
+    </div>
+</div>
+</body>
+<script>
+loaduserdata(true,"ok");
+</script>
+</html>

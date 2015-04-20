@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>root</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="copyright" content="David Stutz" />
+<link href='css/config.css' rel='stylesheet' />
+</head>
+<body>
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+<script type="text/javascript">
+var userarr="";
+var global_mapuserid = "";
+
+$(document).ready(function() {
+	window.prettyPrint() && prettyPrint();
+	
+	$('#examplethermostatuser').multiselect({
+			maxHeight: 150,
+			//buttonWidth:128
+	});
+	
+	$('#examplethermostat').multiselect({
+			includeSelectAllOption: true,
+			enableFiltering: true,
+			maxHeight: 150
+	});	
+});
+
+function savemapthermostat(bool,reponse){
+	if(bool){
+		document.getElementById("examplethermostaterror").style.display = 'none';
+		document.getElementById("examplethermostatheader").className = 'form-group has-feedback';
+		
+		userarr = "";
+		var temp =  $('#examplethermostat').val();
+		
+		if(temp != null){
+			for(var i = 0;i < temp.length-1; i++){
+				if(temp[i] != "multiselect-all")userarr += temp[i]+",";
+			}
+			if(temp[i] != "multiselect-all")userarr += temp[i];
+		}
+		
+		if(userarr != "" && global_mapuserid != ""){
+			pagename = "set_user_wise_therm";
+			var flag = "A";
+			user_id = global_mapuserid;
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+user_id+ "&thermid="+userarr+ "&id="+userid+ "&flag="+flag;
+			ajax_request(true,pagename,data_parameters,savemapthermostat);
+		}
+		else{
+			if(userarr == ""){
+				document.getElementById("examplethermostaterror").style.display = 'block';
+				document.getElementById("examplethermostatheader").className = 'form-group has-feedback has-error'; 
+			}
+		}
+	}else{
+		userarr = "";
+		allconfiguser=new Array();
+		
+		unselectvalues("#examplethermostat");
+		$('#mapthermostatsuccesssalert').modal({keyboard: true});
+		$('#mapthermostatdatatable').dataTable().fnDestroy();
+		loadmappedthermostatdata(true,"ok");
+	}
+}
+
+function unselectvalues(id){
+	$('option', $(id)).each(function(element) {
+			$(this).removeAttr('selected').prop('selected', false);
+		});
+	$(id).multiselect('refresh');
+}
+
+function selectboxthermostatuser(bool,response){
+	if(bool){
+		pagename = "get_user";
+		var flag = "S";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&username="+""+ "&flag="+flag+ "&userid="+userid;
+		ajax_request(true,pagename,data_parameters,selectboxthermostatuser);
+	}else{
+		var obj = JSON.parse(response);
+		var str = "";
+		if(obj[0].status != "N"){
+			
+			for(var i = 0,j = 1; i < obj.length; i++,j++){
+				$('#examplethermostatuser').append('<option value="' + obj[i].user_id + '">' + obj[i].username + '</option>');
+			}
+			
+			$('#examplethermostatuser').multiselect('rebuild');
+			$('#examplethermostatuser').multiselect({
+				onChange:function(element, checked){
+					selectboxthermostat(true,element[0].value);
+				}
+				
+			});
+			selectboxthermostat(true,obj[0].user_id);
+		}
+	}
+}
+
+function selectboxthermostat(bool,response){
+	if(bool){
+		pagename = "user_map_therm";
+		var flag = "V";
+		global_mapuserid = response;
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&flag="+flag+ "&userid="+response;
+		ajax_request(true,pagename,data_parameters,selectboxthermostat);
+	}else{
+		var obj = JSON.parse(response);
+		var str = "";
+		if(obj[0].status != "N"){
+			
+			for(var i = 0,j = 1; i < obj.length; i++,j++){
+				$('#examplethermostat').append('<option value="' + obj[i].therm_id + '">' + obj[i].thermostat_name + '</option>');
+			}
+			$('#examplethermostat').multiselect('rebuild');
+			$('#examplethermostat').multiselect({
+				includeSelectAllOption: true,
+				enableCaseInsensitiveFiltering: true,
+				maxHeight: 150
+			});
+			
+		}
+	}
+}
+
+
+function loadmappedthermostatdata(bool,response){
+	if(bool){
+		pagename = "user_map_therm";
+		var flag = "S";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&flag="+flag+ "&userid="+userid;
+		ajax_request(true,pagename,data_parameters,loadmappedthermostatdata);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+				str += '<tr><td>'+obj[i].username+'</td><td>'+obj[i].location_name+'</td><td>'+obj[i].thermostat_name+'</td><td>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-trash" style="cursor:pointer" title="Delete" onClick="deletemapthermostat(\''+obj[i].user_id+'\',\''+obj[i].uml_location_id+'\',\''+obj[i].therm_id+'\')"></span></td></tr>';	
+			}
+			document.getElementById("mapthermostatdataload").innerHTML = str;
+			if(obj.length > 7)$('#mapthermostatdatatable').dataTable({"bPaginate": true, "bLengthChange": false, "iDisplayLength":7});
+			else $('#mapthermostatdatatable').dataTable({"bPaginate": false});
+		}
+	}
+}
+
+function deletemapthermostat(user_id,thermid){
+	$('#thermostatmapconfirm').modal({
+		keyboard: true 
+	});
+	document.getElementById("confirmuserid").value = user_id;
+	document.getElementById("confirmlocid").value = thermid;
+}
+
+function deletemapthermostat1(bool,response){
+	if(bool){
+		pagename = "set_user_wise_therm";
+		var flag = "R";
+		var user_id = document.getElementById("confirmuserid").value;
+		var thermid = document.getElementById("confirmlocid").value; 
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+user_id+ "&thermid="+thermid+ "&id="+userid+ "&flag="+flag;
+		ajax_request(true,pagename,data_parameters,deletemapthermostat1);
+		
+	}else{
+		$('#thermostatmapconfirm').modal('hide');
+		$('#mapthermostatdeletesucess').modal({
+			keyboard: true 
+		});
+		$('#mapthermostatdatatable').dataTable().fnDestroy();
+		loadmappedthermostatdata(true,"ok");
+	}
+}
+
+</script>
+
+
+<div class="container">
+    <div class="row"><br/>
+    	<div id="mapLocationdiv1"> 
+            <div id="mapLocationdiv" class="col-sm-3" style="border:1px solid #CCC;">
+                <h4><b>Map Thermostat</b></h4><hr>
+                    <div id="mapthermostatalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div class="alert alert-success fade">
+                        <strong>Success! </strong> Thermostat mapped successfully.
+                        </div>
+                    </div>
+                    
+                    <label for="inputError2" >Select User</label>
+                    <div class="form-group has-feedback" id="examplethermostatuserheader" style="text-align:right">
+                    	<select id="examplethermostatuser" class="form-control" style="border-radius:0px;"></select>
+                        <span id="examplethermostatusererror" style="display:none; width:300px" class="help-block">Please select location</span>
+                    </div>
+                    
+                    <label for="inputError2" >Select Thermostat</label>
+                    <div class="form-group has-feedback" id="examplethermostatheader" style="text-align:left">
+                    	<select id="examplethermostat" multiple="multiple"></select>
+                        <span id="examplethermostaterror" style="display:none;" class="help-block">Please select thermostat</span>
+                    </div>
+                    
+                    <div class="form-group">    
+                    <button onClick="savemapthermostat(true,'ok')" type="button" id="Locationaddbutton" class="all-btn-custom btn-sm btn-block ">
+                        <span class="glyphicon glyphicon-plus"></span> Assign
+                    </button>
+                    </div>
+            </div>
+ 
+ 
+ 
+            
+ 
+<!-- ===============mapthermostat Added succefull============-->
+<div id="mapthermostatsuccesssalert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info alert-modal-success">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Thermostat mapped successfully.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============mapthermostat Added succefull============-->   
+
+<!-- ===============Delete Detail Success============-->
+<div id="mapthermostatdeletesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Mapped thermostat deleted successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Delete Detail Success============-->  
+
+<!-- ===============Confirm box============-->
+<div id="thermostatmapconfirm" class="modal fade" style="margin-top:0px; border-radius:0px;">
+   <div class="modal-dialog">
+       <div class="modal-content" style="border-radius:0px;">
+            <div class="modal-header alert-modal-success" >
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <input type="hidden" id="confirmuserid"><input type="hidden" id="confirmlocid">
+                <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure?</p>
+               <!-- <p class="text-warning"><small>If you don't save, your changes will be lost.</small></p>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onClick="deletemapthermostat1('true','ok')">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===============Confirm box============-->         
+            
+              <div  id="loadLocationdetaildata" class="col-sm-9">
+                <table id="mapthermostatdatatable" class="table table-hover">
+                   <thead>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4>Mapped Thermostat List</h4>
+                            </div>
+                        </div>
+                      <tr>
+                         <th>Username</th><th>Location Name</th><th>Thermostat Name</th><th>Action</th>
+                      </tr>
+                   </thead>
+                   <tbody id="mapthermostatdataload">
+                        
+                   </tbody>
+                 </table>   
+              </div>
+        </div>
+	</div>
+</div>
+</body>
+<script>
+selectboxthermostatuser(true,"ok");
+loadmappedthermostatdata(true,"ok");
+</script>
+</html>
+ 

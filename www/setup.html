@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app="">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Root</title>
+<link rel="icon" href="images/favicon.png" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+<link rel="stylesheet" href="multiselect/bootstrap-multiselect.css" type="text/css">
+<link rel="stylesheet" href="multiselect/prettify.css" type="text/css">
+<script type="text/javascript" src="multiselect/bootstrap-multiselect.js"></script>
+<script type="text/javascript" src="multiselect/prettify.js"></script>
+<script>
+var temp = "";
+var global_setup_menu = "";
+
+
+$(document).ready(function(){
+	if(localStorage.getItem("usertype") == "U"){
+		window.location="logout.html";
+	}
+});
+function loadsetuppage(id){
+	if(temp != ""){
+		document.getElementById(temp).className = '';
+	}
+	temp = id;
+	document.getElementById(id).className = 'active';
+	$("#setuppageload").load(id);
+}
+</script>
+</head>
+
+<body>
+<div ng-include="'header.html'"></div>
+<!-- Header -->  
+    <ul class="nav nav-tabs" style="cursor:pointer; margin-top:60px; margin-left:-15px;">
+        <li id="user.html" onclick="loadsetuppage(this.id)"><a>User</a></li>
+        <li id="classification.html" onclick="loadsetuppage(this.id)"><a>Classification</a></li>
+        <li id="location.html" onclick="loadsetuppage(this.id)"><a>Location</a></li>
+        <li id="rooms.html" onclick="loadsetuppage(this.id)"><a>Room</a></li>
+        <li id="thermostat.html" onclick="loadsetuppage(this.id)"><a>Thermostat</a></li>
+       	<li id="schedule.html" onclick="loadsetuppage(this.id)"><a>Schedule</a></li>
+    </ul>
+<div id="setuppageload"></div>
+</body>
+<script>
+loadsetuppage('user.html')
+</script>
+</html>

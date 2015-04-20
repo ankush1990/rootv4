@@ -30,7 +30,7 @@
 	width: 100%;
 	box-sizing: border-box;
 	font-family: montserrat;
-	color: #134562;
+	color: #2C3E50;
 	font-size: 13px;
 }
 /*buttons*/
@@ -46,13 +46,13 @@
 	margin: 10px 5px;
 }
 #msform .action-button:hover, #msform .action-button:focus {
-	box-shadow: 0 0 0 2px white, 0 0 0 3px #134562;
+	box-shadow: 0 0 0 2px white, 0 0 0 3px #0F9D58;
 }
 /*headings*/
 .fs-title {
 	font-size: 15px;
 	text-transform: uppercase;
-	color: #134562;
+	color: #2C3E50;
 	margin-bottom: 10px;
 }
 .fs-subtitle {
@@ -110,3 +110,8 @@
 	background: #134562;
 	color: white;
 }
+
+/*  instrections  css*/
+.instrections{ text-align:center; border: #F00 solid 1px; float:none; margin-bottom:10px; font-size:12px;
+}
+.icon_img{ margin-top:-14px;}

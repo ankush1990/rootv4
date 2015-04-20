@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<title></title>
+<script>
+function destroy_session() {
+	localStorage.setItem("userid", -1);
+	localStorage.setItem("slocid",-1);
+	localStorage.setItem("orgid", -1);
+	localStorage.setItem("locid",-1);
+	localStorage.setItem("locname",-1);
+	localStorage.setItem("thermid",-1);
+	localStorage.setItem("thermame",-1); 
+	localStorage.setItem("username",-1);
+	localStorage.setItem("usertype",-1);
+	localStorage.setItem("refreshfirst",1); 
+	window.location = "index.html";
+}
+</script>
+</head>
+<body>
+</body>
+<script>
+destroy_session();
+</script>
+</html>

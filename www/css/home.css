@@ -14,7 +14,7 @@
 .btn-default:focus,
 .btn-default:active,
 .btn-default.active {
-  background-color: #35a671;
+  background-color: #134562;
   border-color: #2f9264;
   color:#FFF;
   
@@ -69,7 +69,7 @@ fieldset[disabled] .btn-default.active {
 #custom{height:100px; width:100px; background-image:url(../images/custom_down.png);  border:none; outline:none;  background-size:106% 110%; margin:0px 20px 30px 20px;}
 <!--#custom:hover{cursor:pointer; background-image:url(images/custom_up.png);}-->
 
-#off{height:100px; width:100px; background-image:url(../images/off-down.png);  border:none; outline:none;  background-size:106% 110%; margin:0px 20px 30px 20px;}
+#off{height:100px; width:100px; background-image:url(../images/off_down.png);  border:none; outline:none;  background-size:106% 110%; margin:0px 20px 30px 20px;}
 #off:hover{cursor:pointer; background-image:url(images/off-up.png);}
 
 

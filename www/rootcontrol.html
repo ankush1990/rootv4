@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>root</title>
+<meta name="robots" content="Root" />
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta name="copyright" content="Root" />
+<link href='css/config.css' rel='stylesheet' />
+
+<style type="text/css">
+.bs-example{
+	margin:50px;
+}
+
+.panelownheading{
+	padding:10px 15px;
+	cursor:pointer;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+</style>
+<script>showloadingimage();</script>
+<script>
+var thermid = localStorage.getItem("thermid");
+var globalgroupname = "";
+
+function loadrootcontrolsensor(bool,response){
+	if(bool){
+		pagename = "get_root_control";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid;
+		ajax_request(true,pagename,data_parameters,loadrootcontrolsensor);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		var str = "";
+		
+		if(obj[0].status != "N"){
+			for(var i = 0,j = 1; i < obj.length; i++,j++){
+				str +=  '<div class="panel panel-default userselectnone" style="border-radius:0px; margin-bottom:-6px;">';
+				str += 	'<div class="panel-heading panelownheading" data-toggle="collapse" data-parent="#accordion" data-target="#collapse'+i+'" onclick="storelocation(\''+obj[i].room_id+'\')">';
+				str += 	'<h4 class="panel-title">';
+				
+				if(obj[i].room_id == globalgroupname){
+					str += 	'<i class="indicator glyphicon glyphicon-chevron-down pull-right"></i>';
+				}
+				else{
+					str += 	'<i class="indicator glyphicon glyphicon-chevron-right pull-right"></i>';
+				}
+				
+				str += 		'<a><b>'+obj[i].room_name+'</b></a>';
+				str += 	'</h4>';
+				str += 	'</div>';
+				
+				if(obj[i].room_id == globalgroupname){
+					str += 	'<div id="collapse'+i+'" class="panel-collapse collapse in">';
+				}
+				else{
+					str += 	'<div id="collapse'+i+'" class="panel-collapse collapse out">';
+				}
+				str += 	'<div class="panel-body">';
+				str +=  '<table id="configureddatatable'+i+'" class="table">';
+				str += 	'<thead><tr><th>Device ID</th><th>Type</th><th>Device</th><th>Status</th></tr></thead><tbody>';
+				
+				for(l = 0; l < obj[i].sensor_details.length; l++){
+					str +=  '<tr><td>'+obj[i].sensor_details[l].sensor_id+'</td>';
+					str +=  '<td>'+obj[i].sensor_details[l].sensor_type+'</td><td>'+obj[i].sensor_details[l].sensor_name+'</td>';
+					str +=  '<td>';
+					/* code for rocker switch */
+					if(obj[i].sensor_details[l].sensor_type_id == "1"){
+						if(obj[i].sensor_details[l].sensor_status == "On"){
+							str +=  '<img src="images/Icon/rockeron.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+						else{
+							str +=  '<img src="images/Icon/rockeroff.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+					}
+					/* code for light sensor */
+					if(obj[i].sensor_details[l].sensor_type_id == "2"){
+						
+						if(obj[i].sensor_details[l].sensor_status == "on" || obj[i].sensor_details[l].sensor_status == "On" || obj[i].sensor_details[l].sensor_status == "ON"){
+							str +=  '<div class="btn-group btn-toggle"><button class="btn btn-xs btn-primary active" style="outline:none" value="'+obj[i].sensor_details[l].sensor_id+'">ON</button>';
+							str +=  '<button class="btn btn-xs btn-default" style="outline:none" value="'+obj[i].sensor_details[l].sensor_id+'">OFF</button></div>';
+						}
+						else{
+							str +=  '<div class="btn-group btn-toggle"><button class="btn btn-xs btn-default" style="outline:none" value="'+obj[i].sensor_details[l].sensor_id+'">ON</button>';
+							str +=  '<button class="btn btn-xs btn-primary active" style="outline:none" value="'+obj[i].sensor_details[l].sensor_id+'">OFF</button></div>';
+						}
+					}
+					/* code for window sensor */
+					if(obj[i].sensor_details[l].sensor_type_id == "3"){
+						if(obj[i].sensor_details[l].sensor_status == "Open"){
+							str +=  '<img src="images/Icon/wopen.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+						else{
+							str +=  '<img src="images/Icon/wclosed.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+					}
+					/* code for temperature sensor */
+					if(obj[i].sensor_details[l].sensor_type_id == "4"){
+						str +=  '<img src="images/Icon/tempsensor.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+					}
+					/* code for occupancy sensor */
+					if(obj[i].sensor_details[l].sensor_type_id == "5"){
+						if(obj[i].sensor_details[l].sensor_status == "UnOccupied"){
+							str +=  '<img src="images/Icon/unoccupied.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+						else{
+							str +=  '<img src="images/Icon/occupied.png" style="margin-top:-4px;" height="20" width="20">&nbsp;'+obj[i].sensor_details[l].sensor_status;
+						}
+					}
+			  		str +=  '</td></tr>';	
+				}
+				str += 	'</tbody>';
+				str += 	'</table>';
+				str += 	'</div>';
+				str += 	'</div>';
+				str +=  '</div>';
+				
+				$("#configureddatatable"+i).dataTable({"bPaginate": false});
+			}
+			
+			document.getElementById("accordion").innerHTML = str;
+			//$('#configuredsensordatatable').dataTable({"bPaginate": false});
+		}
+		else{
+			str +=  '<table class="table col-sm-12  table-hover">';
+			str += '<tr style="font-weight:bold"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>No Device Configured</td><td></td><td></td></tr></table>';
+			document.getElementById("accordion").innerHTML = str;
+			//$('#configuredsensordatatable').dataTable({"bPaginate": false,  "bSort": false, "bStateSave": true, "searching": false});
+		}
+	}
+	$('.btn-toggle').click(function() {
+   		$(this).find('.btn').toggleClass('active');  
+    	if ($(this).find('.btn-primary').size()>0) {
+    		$(this).find('.btn').toggleClass('btn-primary');
+			onclick_sensorid = $(this).find('.btn-primary').val();
+			onofflight(true,$(this).find('.btn-primary').html());
+		}
+    	$(this).find('.btn').toggleClass('btn-default');
+    });
+}
+
+var onclick_sensorid;
+//on/off light in Root control
+function onofflight(bool,response){
+	if(bool){
+		pagename = "set_root_control";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&thermid="+thermid+ "&deviceid="+0+ "&baseid="+0+ "&status="+response+ "&data="+"NA"+ "&sensorid="+onclick_sensorid;
+		//alert(data_parameters);
+		ajax_request(true,pagename,data_parameters,onofflight);
+	}else{
+	}
+}
+//on/off light in Root control
+
+
+function storelocation(groupname){
+	if(globalgroupname != ""){
+		if(globalgroupname == groupname){
+			globalgroupname = "";
+		}
+		else{
+			globalgroupname = groupname;
+		}
+	}
+	else globalgroupname = groupname;
+}
+
+var rootcontrolsensors = setInterval(function(){ loadrootcontrolsensor(true,"ok"); }, 7000);
+</script>
+</head>
+<body>
+<div class="bs-example" style="margin-top:80px;">
+    <div class="panel-group" id="accordion">
+    </div>
+</div>
+</body>
+<script>
+loadrootcontrolsensor(true,"ok");
+
+function toggleChevron(e) {
+    $(e.target)
+        .prev('.panel-heading')
+        .find("i.indicator")
+        .toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+}
+$('#accordion').on('hidden.bs.collapse', toggleChevron);
+$('#accordion').on('shown.bs.collapse', toggleChevron);
+
+</script>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Root</title>
+<link rel="icon" href="images/favicon.png" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script>
+var temp1 = "";
+var global_setup_menu = "";
+
+function loadconfigurepage(id){
+	if(temp1 != ""){
+		document.getElementById(temp1).className = '';
+	}
+	temp1 = id;
+	document.getElementById(id).className = 'active';
+	
+	if(id == "sensorconfigured.html"){
+		clearInterval(timmerforlearning);
+	}
+	$("#configurepageload").load(id);
+}
+</script>
+</head>
+
+<body>
+    <ul class="nav nav-tabs" style="cursor:pointer; margin-top:60px; margin-left:-15px;">
+        <li id="sensorconfigure.html" onclick="loadconfigurepage(this.id)"><a>Configuration</a></li>
+        <li id="sensorconfigured.html" onclick="loadconfigurepage(this.id)"><a>Sensors</a></li>
+    </ul>
+<div id="configurepageload"></div>
+
+</body>
+<script>
+loadconfigurepage('sensorconfigure.html');
+</script>
+</html>

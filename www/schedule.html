@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='datetimepicker/css/bootstrap-datetimepicker.min.css' rel='stylesheet'>
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row"><br/>
+    	<div id="addschedulediv1"> 
+            <!--start add schedule div-->
+            <div id="addschedulediv" class="col-sm-3" style="border:1px solid #CCC;">
+                <h4><b>Add New Schedule</b></h4><hr>
+                    <div id="schedulenameerrorheader" class="form-group has-feedback">
+                    <label for="inputError2">Schedule Name</label>
+                         <input type="text" class="form-control" id="schedulename">
+                         <input type="hidden" id="schedulenamevalidatecheck" \>
+                         <span id="schedulenameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                         <span id="schedulenamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                         <span id="schedulenamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                         <span id="schedulenamewarning" style="display:none;" class="help-block">Schedule name already exists</span>
+                    </div>
+                    <button onClick="saveschedule(true,schedulename.value)" type="button" class="all-btn-custom btn-sm btn-block">
+                        <span class="glyphicon glyphicon-plus"></span> ADD
+                    </button>
+                    <br />
+            </div>
+            <!--start add schedule div-->
+            
+            <!-- ===============Edit Schedule============-->
+        <div id="editschedulediv" class="col-sm-3" style="border:1px solid #CCC; display:none;">
+        	<h4><b>Edit Schedule</b></h4><hr>
+            	<div id="editschedulenameerrorheader" class="form-group has-feedback">
+                <label for="inputError2">Schedule Name</label>
+                     <input type="text" class="form-control" id="editschedulename">
+                     <input type="hidden" id="editschedulenamevalidatecheck" \>
+                     <input type="hidden" id="editscheduleid" \>
+                     <span id="editschedulenameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                     <span id="editschedulenamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                     <span id="editschedulenamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                     <span id="editschedulenamewarning" style="display:none;" class="help-block">Name already exists.</span>
+                     <br/>
+                     <b>Active</b> <input type="checkbox" id="scheduleactiveyn" checked />
+				</div>
+				<div class="form-group">         
+          			<button  class="btn-exit" style="width:49%" onClick="hideeditschedulediv()">Exit</button>
+                    <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="saveeschedulediv(true,editschedulename.value)">Update</button>
+          		</div>
+         		<br />
+        </div>
+ 		<!-- ===============Edit Schedule============-->
+        
+        	<!--start load schedule-->
+        	<div  id="loadscheduledetaildata" class="col-sm-9">
+            <table id="scheduledatatable" class="table table-hover">
+               <thead>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Schedule List</h4>
+                        </div>
+                    </div>
+                  <tr>
+                     <th>Schedule</th><th>Created By</th><th>Created On</th><th>Action</th>
+                  </tr>
+               </thead>
+               <tbody id="scheduledataload"></tbody>
+             </table>   
+            </div><!--end load schedule-->
+        </div><!--end schedulediv-->
+
+<!-- ===============start Schedule Added succefull============-->
+<div id="schedulesuccesssalert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info alert-modal-success">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Schedule added succesfully.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============end Schedule Added succefull============-->
+
+
+
+<!-- ===============update schedulename Success============-->
+<div id="updateschedulenamesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Schedule updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============update schedulename Success============-->
+
+<!-- ===============start Time Grater Alert============-->
+<div id="timegrateralert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info" style="background-color:#D43F3A; color:#FFF">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Start time should be less than End time.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============end Time Grater Alert============-->
+
+<!-- ===============Delete Detail Success============-->
+<div id="scheduledtdeletesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Detail deleted successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Delete Detail Success============--> 
+
+<!-- ===============Confirm box============-->
+<div id="scheduledtdeleteconfirm" class="modal fade" style="margin-top:0px; border-radius:0px;">
+   <div class="modal-dialog">
+       <div class="modal-content" style="border-radius:0px;">
+            <div class="modal-header alert-modal-success" >
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <input type="hidden" id="schid"><input type="hidden" id="scheduledtid">
+                <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure?</p>
+               <!-- <p class="text-warning"><small>If you don't save, your changes will be lost.</small></p>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onClick="deletedetailsucess('true','ok')">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===============Confirm box============-->    
+
+<!-- ===============start Threshhold Grater Alert============-->
+<div id="thresholdgrateralert" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info" style="background-color:#D43F3A; color:#FFF">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Low threshold should be less than High threshold.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============end Threshhold Grater Alert============-->
+
+<!-- ===============start Time Range Alert============-->
+<div id="timenotinrange" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info" style="background-color:#D43F3A; color:#FFF">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Time Range should not between the another Time Range.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============end Time Range Alert============-->
+
+<!-- ===============Schedule Detail Success============-->
+<div id="scheduledtsucess" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-info alert-modal-success">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Success</h4>
+            </div>
+            <form class="form-horizontal" role="form">
+            <div class="modal-body">
+                <div class="container">
+                    Detail added successfully.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- ===============Schedule Detail Success============-->
+
+        
+<!-- ===============Update Detail Success============-->
+<div id="scheduledtupdatesucess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Detail updated successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Update Detail Success============-->
+
+<!--===================Edit Detail In Schedule================================ -->      
+		<div id="editdetailschedulediv1" style="display:none;">
+        	<div id="editdetailschedulediv" class="col-sm-3" style="border:1px solid #CCC;">
+        		<h4><b>Edit Schedule Detail</b></h4><hr>
+            	<div id="scheduledetailalertsuccess" class="span4 pull-center" style="display:none;">
+        			<div class="alert1 alert-success fade">
+        			<strong>Success! </strong> Detail added successfully.
+    				</div>
+                </div>
+            	<div id="editschedulenameerrorheader" class="form-group has-feedback">
+                	<input type="hidden" id="editscheduledetail_id">
+                    <input type="hidden" id="editseq_no">
+                	<input type="text" class="form-control" id="editscheduledetailname" disabled onKeyUp="checkschedulename(true,this.value)">
+                    <h5><b>Time Range</b></h5>
+                    <span>Start:</span>
+                        <div class='input-group' id='editstart'>
+                                <input type='text' class="form-control" id="editstart1" data-format="HH:mm:ss"/>
+                                <span class="input-group-addon input-group-addon-withradius" style="border-radius:0px;"><span class="glyphicon glyphicon-time"></span>
+								</span>
+                        </div>
+                        <span>End:</span>
+                        <div class='input-group date' id='editstop'>
+                                <input type='text' class="form-control" id="editstop1" data-format="HH:mm:ss"/>
+                                <span class="input-group-addon input-group-addon-withradius" style="border-radius:0px;"><span class="glyphicon glyphicon-time"></span>
+                                </span>
+                    	</div><br /> 
+                     <label for="inputError2">Low Threshold</label>
+                     <input type="text" class="form-control" id="editlowthreshold">
+                     <label for="inputError2">High Threshold</label>
+                     <input type="text" class="form-control" id="edithighthreshold">
+				</div>
+                <div class="form-group">         
+          			<button  class="btn-exit" style="width:49%" onClick="editscheduledetailhide()">Back</button>
+                    <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="editvalidatetimerange(true,editstart1.value)">Update</button>
+          		</div>
+				
+        	</div><!--end editdetailschedulediv-->
+        </div><!--end editdetailschedulediv1-->
+<!--===================Edit Detail In Schedule================================ -->    
+
+        
+<!--===================Add Detail In Schedule================================ -->
+		<div id="adddetailschedulediv1" style="display:none;">
+            <div id="adddetailschedulediv" class="col-sm-3" style="border:1px solid #CCC;">
+                <h4><b>Add Schedule Detail</b></h4><hr>
+                    <div id="scheduledetailalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div class="alert1 alert-success fade">
+                        <strong>Success! </strong> Detail added successfully.
+                        </div>
+                    </div>
+                    <div id="schedulenameerrorheader" class="form-group has-feedback">
+                        <input type="hidden" id="scheduledetail_id">
+                        <input type="text" class="form-control" id="scheduledetailname" disabled onKeyUp="checkschedulename(true,this.value)">
+                        <h5><b>Time Range</b></h5>
+                        <span>Start:</span>
+                            <div class='input-group' id='start'>
+                                    <input type='text' class="form-control" id="start1" data-format="HH:mm:ss"/>
+                                    <span class="input-group-addon input-group-addon-withradius" style="border-radius:0px;"><span class="glyphicon glyphicon-time"></span>
+                                    </span>
+                            </div>
+                            <span>End:</span>
+                            <div class='input-group date' id='stop'>
+                                    <input type='text' class="form-control" id="stop1" data-format="HH:mm:ss"/>
+                                    <span class="input-group-addon input-group-addon-withradius" style="border-radius:0px;"><span class="glyphicon glyphicon-time"></span>
+                                    </span>
+                        </div><br /> 
+                         <label for="inputError2">Low Threshold</label>
+                         <input type="text" class="form-control" id="lowthreshold">
+                         <label for="inputError2">High Threshold</label>
+                         <input type="text" class="form-control" id="highthreshold">
+                    </div>
+                    <div class="form-group">        
+                        <button  class="btn-exit" style="width:49%" onClick="hideschedulediv()">Exit</button>
+                        <button id="editgroupupdate" class="btn-adddetail" style="width:49%" onClick="validatetimerange(true,start1.value)">Add Detail</button>
+                    </div>
+            </div><!--end adddetailschedulediv-->
+        
+        	<div  id="loadgroupdata" class="col-sm-9">
+            <table id="scheduledetaildatatable" class="table table-hover">
+               <thead>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Schedule Detail List</h4>
+                        </div>
+                    </div>
+                  <tr>
+                     <th>Start Time</th><th>End Time</th><th>Low Threshold</th><th>High Threshold</th><th>Action</th>
+                  </tr>
+               </thead>
+               <tbody id="scheduledetaildataload">
+                    
+               </tbody>
+             </table>   
+            </div><!--end loadgroupdata-->
+        </div><!--end adddetailschedulediv1-->
+<!--===================Add Detail In Schedule================================ -->      
+    </div><!--end row div-->
+</div><!--end container div-->
+
+
+<script src="datetimepicker/js/moment.js"></script><!--datetimepicker js-->
+<script src="datetimepicker/js/bootstrap-datetimepicker.min.js"></script><!--datetimepicker js-->
+<script src="js/pagesjs/schedule.js"></script><!--schedulepage js-->
+<script type="text/javascript"> 
+loadschedule(true,"ok");
+$(function () { 
+	$('#start').datetimepicker({ pickDate: false });
+	$('#stop').datetimepicker({ pickDate: false });
+	
+	$('#editstart').datetimepicker({ pickDate: false });
+	$('#editstop').datetimepicker({ pickDate: false });
+});
+</script>
+</body>
+</html>

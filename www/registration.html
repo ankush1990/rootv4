@@ -3,28 +3,25 @@
 <head>
 <meta charset="utf-8">
 <title>Root</title>
-<link rel="icon" href="images/root2.png" />
+<link rel="icon" href="images/favicon.png" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Remote monitoring systems - magnum energy solution ">
+<meta name="description" content="Root - magnum energy solution ">
 <meta name="author" content="Magnum">
+
 <link href='css/bootstrap.min.css' rel='stylesheet'>
 <link href='css/registration.css' rel='stylesheet'>
 <link href='css/config.css' rel='stylesheet'>
+
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/ajax_request.js"></script>
 <script type="text/javascript">
 
 $(document).ready(function(){
-	$("#includ-header").load("index-header.html");
-	document.getElementById('company').value = "";
-	document.getElementById('phone').value = "";
-	document.getElementById("username").value = "";
-	document.getElementById("email").value = "";
-	document.getElementById("password").value = "";
-	document.getElementById("cpassword").value = "";
-	document.getElementById("thermostatid").value = "";
-	document.getElementById("groupname").value = "";
+	var d = new Date();
+	var n = d.toDateString();
+	n = n.substr(4,n.length);
+	document.getElementById("header-date").innerHTML = n;
 });
 
 function validation()
@@ -32,24 +29,25 @@ function validation()
 	var company=document.getElementById('company').value;
 	var phone=document.getElementById('phone').value;
 	var math=/^[0-9]+$/.test(phone);
-	document.getElementById("company").style.borderColor = "#ccc";
-	document.getElementById("phone").style.borderColor = "#ccc";
+	document.getElementById("companyvalidation").style.display = "none";
+	document.getElementById("phonevalidation").style.display = "none";
+	document.getElementById("phone1validation").style.display = "none";
 	
 	if(company == "" || phone == "" ){
 			if(company == "" && phone == ""){
-				document.getElementById("company").style.borderColor = "#D00000";
-				document.getElementById("phone").style.borderColor = "#D00000";
+				document.getElementById("companyvalidation").style.display = "block";
+				document.getElementById("phonevalidation").style.display = "block";
 			}
 			if(company == ""){
-				document.getElementById("company").style.borderColor = "#D00000";
+				document.getElementById("companyvalidation").style.display = "block";
 			}
 			if(phone == ""){
-				document.getElementById("phone").style.borderColor = "#D00000";
+				document.getElementById("phonevalidation").style.display = "block";
 			}
 			return false;
 	}
 	else if(!math || phone.length!=10){
-		document.getElementById("phone").style.borderColor = "#D00000";
+		document.getElementById("phone1validation").style.display = "block";
 		return false;
 	}
 	else{
@@ -59,18 +57,9 @@ function validation()
 
 function insert_user(bool,response){
 	if(bool){
-		var username = document.getElementById("username").value;
-		var password = document.getElementById("password").value;
-		var thermostatid = document.getElementById("thermostatid").value;
-		var locationname = document.getElementById("groupname").value;
-		var floorname = document.getElementById("floor").value;
-		var departmentname = document.getElementById("department").value;
-		var emailid = document.getElementById("email").value;
-		var companyname = document.getElementById("company").value;
-		var phoneno = document.getElementById("phone").value;
-		
+		var data = $("#msform :input[name!='cpass']").serialize();
 		pagename = "signup";
-		var data_parameters = "username="+username+ "&password="+password+ "&thermostatid="+thermostatid+ "&locationname="+locationname+ "&floorname="+floorname+ "&departmentname="+departmentname+ "&emailid="+emailid+ "&companyname="+companyname+ "&phoneno="+phoneno;
+		var data_parameters = data;
 		ajax_request(true,pagename,data_parameters,insert_user);
 		return false;
 	}else{
@@ -84,8 +73,13 @@ function insert_user(bool,response){
 </script>
 </head>
 <body>
-<!--Included header footer code using JS-->
-<div id="includ-header"></div>
+<!--Included header-->
+<div class="jumbotron all_bgcolor_withfontcolor" style="margin-top: -40px;">
+	<div class="col-sm-1"></div>
+    	<div class="col-sm-8"><span style="font-size:32px"><a href="index.html" style="text-decoration:none; color:#FFF;">[ root ]</a></span></div>
+        <div  class="col-sm-3"><span id="header-date" style="font-size:26px"></span></div>
+    	<p></p>    
+</div>
 <!--Code for fields-->
 <div class="col-sm-9">
   <div class="row">
@@ -100,22 +94,35 @@ function insert_user(bool,response){
 	</ul>
 	<!-- fieldsets -->
 	<fieldset>
-		<h2 class="fs-title">Create your account</h2>
+    	<h2 class="fs-title">Create your account</h2>
 		<h3 class="fs-subtitle">This is step 1</h3>
+        <div id="thermostatnamevalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+		<input type="text" name="thermostatname" id="thermostatname" placeholder="Enter Thermostat Name" autocomplete="off" />
+        
+        <div id="thermostatidvalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="thermostatid1validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Thermostat ID not valid.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
         <input type="text" name="thermostatid" id="thermostatid" placeholder="Enter Thermostat ID" autocomplete="off" onkeyup="checkthermostat('true','ok')" />
-        <input type="text" name="groupname" id="groupname" placeholder="Enter Location" />
-        <input type="text" name="floor" id="floor" placeholder="Enter Floor" />
-        <input type="text" name="department" id="department" placeholder="Enter Department" />
+        
+        <div id="groupnamevalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <input type="text" name="locationname" id="groupname" placeholder="Enter Location" />
         <input type="button" name="next" id="nextone" class="next action-button" value="Next" />
 	</fieldset>
 	<fieldset>
 		<h2 class="fs-title">Account Information</h2>
 		<h3 class="fs-subtitle">Your login details</h3>
+        <div id="usernamevalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="username1validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Username already exists.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
 		<input type="text" name="username" id="username" placeholder="Username" autocomplete="off"  onkeyup="checkusername('true','ok')"/>
-		<input type="text" name="email" id="email" placeholder="Email"   onkeyup="checkemail('true','ok')"/>
+        <div id="emailvalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="email1validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Email id already exists.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="email2validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Email id isn't valid.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+		<input type="text" name="emailid" id="email" placeholder="Email" value="" autocomplete="off" onkeyup="checkemail('true','ok')"/>
         <label id="my" style="position:absolute; display:none;"></label>
-		<input type="password" name="password" id="password" placeholder="Password"/>
+        <div id="passwordvalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+		<input type="password" name="password" id="password" placeholder="Password" value="" autocomplete="off"/>
         <label id="my1" style="position:absolute; display:none;"></label>
+        <div id="cpasswordvalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="cpassword1validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Confirm password didn't match with old password.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
 		<input type="password" name="cpass" id="cpassword" placeholder="Confirm Password"/>
 		<input type="button" name="previous" class="previous action-button" value="Previous" />
 		<input type="button" name="next" id="nexttwo" class="nexttwo action-button" value="Next" />
@@ -123,14 +130,23 @@ function insert_user(bool,response){
 	<fieldset>
 		<h2 class="fs-title">Personal Details</h2>
 		<h3 class="fs-subtitle">We will never sell it</h3>
-		<input type="text" name="company" id="company" placeholder="Company Name" />
-		<input type="text" name="phone" id="phone" placeholder="Phone" />
+        <div id="companyvalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+		<input type="text" name="companyname" id="company" placeholder="Company Name" />
+        <div id="phonevalidation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Please fill this field.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+        <div id="phone1validation" style="display:none"><div class="col-sm-8 col-xs-11 center-block instrections">Incorrect number.</div><div class="icon_img"><img src="images/basics-04-128.png"></div></div>
+		<input type="text" name="phoneno" id="phone" placeholder="Phone" />
 		<input type="button" name="previous" class="previous action-button" value="Previous" />
 		<input type="button" name="submit" class="action-button"  onClick="validation()" value="Submit" />
 	</fieldset>
 </form>
     
     </div>
+  </div>
+</div>
+<!--Included Footer-->
+<div class="footer navbar-fixed-bottom all_bgcolor">
+  <div class="container">
+    <p></p>
   </div>
 </div>
 <script>
@@ -140,6 +156,7 @@ var left, opacity, scale; //fieldset properties which we will animate
 var animating; //flag to prevent quick multi-click glitches
 
 function checkthermostat(bool,response){
+	document.getElementById("thermostatidvalidation").style.display = "none";
 	var thermostatid = document.getElementById("thermostatid").value;
 	if(bool){
 		pagename = "valid_thermostat";
@@ -149,49 +166,57 @@ function checkthermostat(bool,response){
 		var obj = JSON.parse(response);
 		if(obj[0].status == "N"){
 			document.getElementById("nextone").disabled = "true";
-			document.getElementById("thermostatid").style.borderColor = "#D00000";
+			document.getElementById("thermostatid1validation").style.display = "block";
 		}else{
 			document.getElementById("nextone").disabled = false;
-			document.getElementById("thermostatid").style.borderColor = "#ccc";
+			document.getElementById("thermostatid1validation").style.display = "none";
 		}
 	}
 }
 
 
 function checkusername(bool,response){
+	document.getElementById("usernamevalidation").style.display = "none";
 	var username = document.getElementById("username").value;
 	if(bool){
-		pagename = "username_exists";
-		var data_parameters = "username="+username;
-		ajax_request(true,pagename,data_parameters,checkthermostat);
+		pagename = "user_exists";
+		flag = "A";
+		var data_parameters = "slocid="+0+ "&orgid="+0+ "&id="+0+ "&username="+username+ "&flag="+flag;
+		ajax_request(true,pagename,data_parameters,checkusername);
 	}else{
 		var obj = JSON.parse(response);
+		document.getElementById("my").innerHTML = obj[0].status;
 		if(obj[0].status == "Y"){
-			document.getElementById("nexttwo").disabled = true;
-			document.getElementById("username").style.borderColor = "#D00000";
+			//document.getElementById("nexttwo").disabled = true;
+			document.getElementById("username1validation").style.display = "block";
 		}else{
-			document.getElementById("nexttwo").disabled = false;
-			document.getElementById("username").style.borderColor = "#ccc";
+			//document.getElementById("nexttwo").disabled = false;
+			document.getElementById("username1validation").style.display = "none";
 		}
 	}
 }
 
 
 function checkemail(bool,response){
+	document.getElementById("emailvalidation").style.display = "none";
+	document.getElementById("email2validation").style.display = "none";
+	
 	document.getElementById("my1").innerHTML = "";
 	var emailid = document.getElementById("email").value;
 	if(bool){
 		pagename = "email_exists";
-		var data_parameters = "emailid="+emailid;
+		flag = "A";
+		var data_parameters = "slocid="+0+ "&orgid="+0+ "&id="+0+ "&emailid="+emailid+ "&flag="+flag;
 		ajax_request(true,pagename,data_parameters,checkemail);
 	}else{
 		var obj = JSON.parse(response);
+		document.getElementById("my1").innerHTML = obj[0].status;
 		if(obj[0].status == "Y"){
-			document.getElementById("nexttwo").disabled = true;
-			document.getElementById("email").style.borderColor = "#D00000";
+			//document.getElementById("nexttwo").disabled = true;
+			document.getElementById("email1validation").style.display = "block";
 		}else{
-			document.getElementById("nexttwo").disabled = false;
-			document.getElementById("email").style.borderColor = "#ccc";
+			//document.getElementById("nexttwo").disabled = false;
+			document.getElementById("email1validation").style.display = "none";
 		}
 	}
 }
@@ -202,38 +227,31 @@ function checkemail(bool,response){
 
 $(".next").click(function(){
 	
+	var thermostatname = document.getElementById("thermostatname").value;
 	var thermostat = document.getElementById("thermostatid").value;
 	var groupname = document.getElementById("groupname").value;
-	var floorname = document.getElementById("floor").value;
-	var department = document.getElementById("department").value;
 	
+	document.getElementById("groupnamevalidation").style.display = "none";
+	document.getElementById("thermostatidvalidation").style.display = "none";
+	document.getElementById("thermostatnamevalidation").style.display = "none";
 	
-	if(thermostat == "" || groupname == ""){
+	if(thermostat == "" || groupname == "" || thermostatname == ""){
 		if(thermostat == ""){
-			document.getElementById("thermostatid").style.borderColor = "#D00000";
+			document.getElementById("thermostatidvalidation").style.display = "block";
 		}
 		if(groupname == ""){
-			document.getElementById("groupname").style.borderColor = "#D00000";
+			document.getElementById("groupnamevalidation").style.display = "block";
 		}
-		if(floorname == ""){
-			document.getElementById("floor").style.borderColor = "#D00000";
+		if(thermostatname == ""){
+			document.getElementById("thermostatnamevalidation").style.display = "block";
 		}
-		if(department == ""){
-			document.getElementById("department").style.borderColor = "#D00000";
-		}
-		if(thermostat == "" && groupname == "" && floorname == "" && department == ""){
-			document.getElementById("groupname").style.borderColor = "#D00000";
-			document.getElementById("thermostatid").style.borderColor = "#D00000";
-			document.getElementById("floor").style.borderColor = "#D00000";
-			document.getElementById("department").style.borderColor = "#D00000";
+		if(thermostat == "" && groupname == "" && thermostatname == ""){
+			document.getElementById("groupnamevalidation").style.display = "block";
+			document.getElementById("thermostatidvalidation").style.display = "block";
+			document.getElementById("thermostatnamevalidation").style.display = "block";
 		}
 	}
 	else{
-		document.getElementById("groupname").style.borderColor = "#ccc";
-		document.getElementById("thermostatid").style.borderColor = "#ccc";
-		document.getElementById("floor").style.borderColor = "#ccc";
-		document.getElementById("department").style.borderColor = "#ccc";
-		
 		if(animating) return false;
 			animating = true;
 		
@@ -277,10 +295,14 @@ $(".nexttwo").click(function(){
 	var cpassword = document.getElementById("cpassword").value;
 	
 	
-	document.getElementById("username").style.borderColor = "#ccc";
-	document.getElementById("email").style.borderColor = "#ccc";
-	document.getElementById("password").style.borderColor = "#ccc";
-	document.getElementById("cpassword").style.borderColor = "#ccc";
+	document.getElementById("usernamevalidation").style.display = "none";
+	document.getElementById("emailvalidation").style.display = "none";
+	document.getElementById("username1validation").style.display = "none";
+	document.getElementById("email1validation").style.display = "none";
+	document.getElementById("email2validation").style.display = "none";
+	document.getElementById("passwordvalidation").style.display = "none";
+	document.getElementById("cpasswordvalidation").style.display = "none";
+	document.getElementById("cpassword1validation").style.display = "none";
 	
 	
 	var my = document.getElementById("my").innerHTML;
@@ -290,54 +312,48 @@ $(".nexttwo").click(function(){
 	
 	if(username == "" || email == "" || password == "" || cpassword == ""){
 		if(username == "" && email == "" && password == "" && cpassword == ""){
-			document.getElementById("username").style.borderColor = "#D00000";
-			document.getElementById("email").style.borderColor = "#D00000";
-			document.getElementById("password").style.borderColor = "#D00000";
-			document.getElementById("cpassword").style.borderColor = "#D00000";
+			document.getElementById("usernamevalidation").style.display = "block";
+			document.getElementById("emailvalidation").style.display = "block";
+			document.getElementById("passwordvalidation").style.display = "block";
+			document.getElementById("cpasswordvalidation").style.display = "block";
 		}
 		if(username == ""){
-			document.getElementById("username").style.borderColor = "#D00000";
+			document.getElementById("usernamevalidation").style.display = "block";
 		}
 		if(email == ""){
-			document.getElementById("email").style.borderColor = "#D00000";
+			document.getElementById("emailvalidation").style.display = "block";
 		}
 		if(password == ""){
-			document.getElementById("password").style.borderColor = "#D00000";
+			document.getElementById("passwordvalidation").style.display = "block";
 		}
 		if(cpassword == ""){
-			document.getElementById("cpassword").style.borderColor = "#D00000";
+			document.getElementById("cpasswordvalidation").style.display = "block";
 		}
 		
 	}
-	else if(my == "0" || my1 == "0"){
+	else if(my == "Y" || my1 == "Y"){
 	
-		if(my == "0" && my1 == "0"){
-			document.getElementById("username").style.borderColor = "#D00000";
-			document.getElementById("email").style.borderColor = "#D00000";
+		if(my == "Y" && my1 == "Y"){
+			document.getElementById("username1validation").style.display = "block";
+			document.getElementById("email1validation").style.display = "block";
 		}
 
-		if(my == "0"){
-			document.getElementById("username").style.borderColor = "#D00000";
+		if(my == "Y"){
+			document.getElementById("username1validation").style.display = "block";
 		}
-		if(my1 == "0"){
-			document.getElementById("email").style.borderColor = "#D00000";
+		if(my1 == "Y"){
+			document.getElementById("email1validation").style.display = "block";
 		}
 	}
 	else if(!filter.test(email))
 	{
-		document.getElementById("email").style.borderColor = "#D00000";
+		document.getElementById("email2validation").style.display = "block";
 	}
 	else if(password != cpassword)
 	{
-		document.getElementById("password").style.borderColor = "#D00000";
-		document.getElementById("cpassword").style.borderColor = "#D00000";
+		document.getElementById("cpassword1validation").style.display = "block";
 	}
 	else{
-		document.getElementById("username").style.borderColor = "#ccc";
-		document.getElementById("email").style.borderColor = "#ccc";
-		document.getElementById("password").style.borderColor = "#ccc";
-		document.getElementById("cpassword").style.borderColor = "#ccc";
-		
 		
 		if(animating) return false;
 			animating = true;

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Root</title>
+<link rel="icon" href="images/favicon.png" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script src="js/denydirectaccess.js"></script>
+<script>
+var temp_message = "";
+var global_message_menu = "";
+
+function loadmessagepage(id){
+	if(temp_message != ""){
+		document.getElementById(temp_message).className = '';
+	}
+	temp_message = id;
+	document.getElementById(id).className = 'active';
+	$("#messagepageload").load(id);
+}
+
+
+</script>
+</head>
+
+<body>
+<!-- Header -->  
+		<ul class="nav nav-tabs" style="cursor:pointer; margin-top:60px; margin-left:-15px;">
+        	<li id="messagereceive.html" onclick="loadmessagepage(this.id)"><a>Inbox</a></li>
+            <li id="messagesent.html" onclick="loadmessagepage(this.id)"><a>Sent</a></li>
+		</ul>
+      
+<div id="messagepageload"></div>
+</body>
+<script>
+loadmessagepage('messagereceive.html')
+</script>
+</html>

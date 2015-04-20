@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title></title>
+<link rel="icon" href="images/favicon.png" />
+<link href='css/config.css' rel='stylesheet'>
+<link href='css/simple-sidebar.css' rel='stylesheet'>
+<style>
+body{
+    background: url(images/root2.png);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+</style>
+
+<script src="js/ajax_request.js"></script>
+<script src="js/jquery.bootstrap-growl.js"></script>
+<script>
+
+var slocid = localStorage.getItem("slocid");
+var orgid =	localStorage.getItem("orgid");
+var userid = localStorage.getItem("userid");
+var locid;
+
+$(document).ready(function(){
+	//code for maintain session
+	if((localStorage.getItem("userid") != null) && ((localStorage.getItem("userid")) != -1)){
+		//window.location="index.html";
+	}
+	else{
+		window.location="logout.html";
+	}
+	//code for launch change password dialog
+	$('.launch-changepwd').click(function(){
+		document.getElementById("opwd").value = "";
+		document.getElementById("npwd").value = "";
+		document.getElementById("cpwd").value = "";
+		document.getElementById("feedopwd").className = "";
+		document.getElementById("headopwd").className = "form-group has-feedback";
+		document.getElementById("feednpwd").className = "";
+		document.getElementById("headnpwd").className = "form-group has-feedback";		
+		document.getElementById("feedcpwd").className = "";
+		document.getElementById("headcpwd").className = "form-group has-feedback";
+		document.getElementById("cpwdwarning").style.display = "none";
+		document.getElementById("passwordwarning").style.display = "none";
+		
+		$('#changepassword').modal({
+			keyboard: true 
+		});
+	}); 
+}); 
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
+
+
+function loadpageheader(id){
+	if((localStorage.getItem("usertype") == "U")){
+		if(id == "sensorconfiguration" || id == "setup"){
+			window.location.href = 'logout.html';
+		}
+		$("#sidebaradminsetup").css("display","none");
+		$("#sidebaradminsensorconfiguration").css("display","none");
+	}
+
+	$("#sb-site").load(id+".html");
+	$("#"+id).css({"color":"#000",'border':'none'});
+	document.getElementById("sidebaradmin"+id).className = 'navactive_header';
+	//if(id == "dashboard")document.getElementById(id+"img").src = "images/Icon/newicon/Home_pressed.png";
+	//if(id == "setup")document.getElementById(id+"img").src = "images/Icon/newicon/admin_pressed.png";
+}
+
+//change password code
+
+function resetpass(bool,response){
+   if(bool){
+	   	document.getElementById("feedopwd").className = "glyphicon form-control-feedback";
+		document.getElementById("headopwd").className = "form-group has-feedback";
+		document.getElementById("feednpwd").className = "glyphicon form-control-feedback";
+		document.getElementById("headnpwd").className = "form-group has-feedback";
+		document.getElementById("feedcpwd").className = "glyphicon form-control-feedback";
+		document.getElementById("headcpwd").className = "form-group has-feedback";
+		document.getElementById("cpwdwarning").style.display = "none";
+		document.getElementById("passwordwarning").style.display = "none";
+		
+	   	var opwd = document.getElementById("opwd").value;
+		var cpwd = document.getElementById("cpwd").value;
+	    var npwd = document.getElementById("npwd").value;
+		var pagename = "change_password";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&id="+userid+ "&userid="+userid+ "&oldpass="+opwd+ "&newpass="+cpwd;
+		
+		if(opwd != "" && cpwd != "" && npwd != ""){
+			if(cpwd != npwd){
+				document.getElementById("feednpwd").className = "glyphicon glyphicon-warning-sign form-control-feedback";
+				document.getElementById("headnpwd").className = "form-group has-feedback has-warning";
+				document.getElementById("feedcpwd").className = "glyphicon glyphicon-warning-sign form-control-feedback";
+				document.getElementById("headcpwd").className = "form-group has-feedback has-warning";
+				document.getElementById("cpwdwarning").style.display = "block";
+			}
+			else ajax_request(true,pagename,data_parameters,resetpass);
+		}
+		else{
+			if(opwd == ""){
+				document.getElementById("feedopwd").className = "glyphicon glyphicon-remove form-control-feedback";
+				document.getElementById("headopwd").className = "form-group has-feedback has-error";
+			}
+			if(npwd == ""){
+				document.getElementById("feednpwd").className = "glyphicon glyphicon-remove form-control-feedback";
+				document.getElementById("headnpwd").className = "form-group has-feedback has-error";
+			}
+			if(cpwd == ""){
+				document.getElementById("feedcpwd").className = "glyphicon glyphicon-remove form-control-feedback";
+				document.getElementById("headcpwd").className = "form-group has-feedback has-error";
+			}
+		}
+	} else {
+		var obj = JSON.parse(response);
+		if(obj[0].status != "N"){
+			$("#changepassword").modal("hide");
+			$('#changepasswordsuccess').modal({
+				keyboard: true 
+			});
+		}
+		else{
+			document.getElementById("feedopwd").className = "glyphicon glyphicon-warning-sign form-control-feedback";
+			document.getElementById("headopwd").className = "form-group has-feedback has-warning";
+			document.getElementById("passwordwarning").style.display = "block";
+		}
+	}
+}
+
+var templocid = localStorage.getItem("locid");
+var templocname = localStorage.getItem("locname");
+var tempthermid = localStorage.getItem("thermid");
+var tempthermname = localStorage.getItem("thermame");
+
+function loadlocationinulbox(bool,response){
+	if(bool){
+		pagename = "user_map_loc";
+		var flag = "V";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&flag="+flag;
+		ajax_request(true,pagename,data_parameters,loadlocationinulbox);
+	}else{
+		var obj = JSON.parse(response);
+		var str = "<li><a>Select Location</a></li>";
+
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+				str += '<li onclick="changethermostat('+obj[i].uml_location_id+',\''+obj[i].location_name+'\');">\<a>'+obj[i].location_name+'</a>\</li>';
+			}
+			
+			if((templocid == null) || (templocid == -1) && (templocname == null) || (templocname == -1)){
+				document.getElementById("location_value_inner").innerHTML = str;
+				document.getElementById("location_value").innerHTML = obj[0].location_name;
+				localStorage.setItem("locid",obj[0].uml_location_id); 
+				localStorage.setItem("locname",obj[0].location_name); 
+				templocid = localStorage.getItem("locid");
+				templocname = localStorage.getItem("locname");
+				loadthermostatinulbox(true,templocid);
+			}
+			else{
+				//alert(">"+localStorage.getItem("locname")+"<");
+				document.getElementById("location_value_inner").innerHTML = str;
+				document.getElementById("location_value").innerHTML = templocname;
+				loadthermostatinulbox(true,templocid);
+			}
+		}
+		
+	}
+}
+
+function changethermostat(id,name){
+	document.getElementById("location_value").innerHTML = name;
+	localStorage.setItem("locid",id); 
+	localStorage.setItem("locname",name); 
+	templocid = localStorage.getItem("locid");
+	templocname = localStorage.getItem("locname");
+	loadthermostatinulbox(true,templocid);
+}
+
+
+function loadthermostatinulbox(bool,response){
+	if(bool){
+		pagename = "loc_map_thermostat";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&locid="+response;
+		ajax_request(true,pagename,data_parameters,loadthermostatinulbox);
+	}else{
+		var obj = JSON.parse(response);
+		var str = '<li><a>Select Thermostat</a></li>';
+		var therm_id_list = "";
+		if(obj[0].status != "N"){
+			for(var i = 0; i < obj.length; i++){
+				str += '<li onclick="changethermostatinbox('+obj[i].therm_id+',\''+obj[i].thermostat_name+'\');">\<a>'+obj[i].thermostat_name+'</a>\</li>';
+				therm_id_list += obj[i].therm_id+",";
+			}
+			
+			if((tempthermid == null) || (tempthermid == -1)){
+				document.getElementById("thermostat_value_inner").innerHTML = str;
+				document.getElementById("thermostat_value").innerHTML = obj[0].thermostat_name;
+				localStorage.setItem("thermid",obj[0].therm_id);
+				localStorage.setItem("thermame",obj[0].thermostat_name);
+				tempthermid = localStorage.getItem("thermid");
+				tempthermname = localStorage.getItem("thermame");
+			}
+			else{
+				var therm_id_list1 = localStorage.getItem("therm_id_list1");
+				if(therm_id_list.localeCompare(therm_id_list1) != 0){
+					document.getElementById("thermostat_value_inner").innerHTML = str;
+					document.getElementById("thermostat_value").innerHTML = obj[0].thermostat_name;
+					localStorage.setItem("thermid",obj[0].therm_id);
+					localStorage.setItem("thermame",obj[0].thermostat_name);
+					localStorage.setItem("therm_id_list1",therm_id_list); 
+					tempthermid = localStorage.getItem("thermid");
+					tempthermname = localStorage.getItem("thermame");
+					
+					var refreshitem = localStorage.getItem("refreshfirst");
+					if(refreshitem != 1)changethermostatinbox(tempthermid,tempthermname);
+				}
+				else{
+					document.getElementById("thermostat_value_inner").innerHTML = str;
+					document.getElementById("thermostat_value").innerHTML = tempthermname;
+				}
+			}
+			localStorage.setItem("refreshfirst",0); 
+		}
+		else{
+			document.getElementById("thermostat_value_inner").innerHTML = str;
+			document.getElementById("thermostat_value").innerHTML = "Select Thermostat";
+
+			$('#nothermostatlistalert').modal({
+					keyboard: true,
+					backdrop: 'static'
+			});
+			loadlocationafteroffline(true,"ok");
+		}
+	}
+}
+
+function changethermostatinbox(id,name){
+	document.getElementById("thermostat_value").innerHTML = name;
+	localStorage.setItem("thermid",id); 
+	localStorage.setItem("thermame",name); 
+	tempthermid = localStorage.getItem("thermid");
+	tempthermname = localStorage.getItem("thermame");
+	location.reload();
+}
+
+
+/* code for select another location if thermostat offline*/
+function loadlocationafteroffline(bool,response){
+	if(bool){
+		pagename = "user_map_loc";
+		var flag = "V";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&flag="+flag;
+		ajax_request(true,pagename,data_parameters,loadlocationafteroffline);
+	}else{
+		var obj = JSON.parse(response);
+		var str = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Select</a></li>';
+		var str1 = '<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Select</a></li>';
+			for(var i = 0; i < obj.length; i++){
+				str += '<li role="presentation" onclick="changethermostat('+obj[i].uml_location_id+',\''+obj[i].location_name+'\');"><a role="menuitem" tabindex="-1" href="#">'+obj[i].location_name+'</a></li>';
+				str1 += '<li role="presentation" onclick="changethermostatafteroffline('+obj[i].uml_location_id+',\''+obj[i].location_name+'\');"><a role="menuitem" tabindex="-1" href="#">'+obj[i].location_name+'</a></li>';
+			}
+			$("#locationofflinelist").html(str);
+			$("#locationofflinelist1").html(str1);
+	}
+}
+
+
+function changethermostatafteroffline(locid,locname)
+{
+	document.getElementById("location_value").innerHTML = locname;
+	localStorage.setItem("locid",locid); 
+	localStorage.setItem("locname",locname); 
+	templocid = localStorage.getItem("locid");
+	templocname = localStorage.getItem("locname");
+	changethermostatafteroffline1(true,locid);
+}
+
+function changethermostatafteroffline1(bool,response)
+{
+	if(bool){
+		pagename = "loc_map_thermostat";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&locid="+response;
+		ajax_request(true,pagename,data_parameters,changethermostatafteroffline1);
+	}else{
+		var obj = JSON.parse(response);
+		if(obj[0].status != "N"){
+			location.reload();
+		}
+	}
+}
+
+function changeopacity(){
+	$("#menu-toggle").css({opacity:1});
+}
+
+function changeopacity1(){
+	$("#menu-toggle").css({opacity:0.5});
+}
+
+
+
+var msgstr = ""; 
+var msgglobalobj;                                    
+function loadmsginpopover(bool,response){
+	if(msgstr == ""){
+		if(bool){
+			pagename = "get_inbox";
+			var searchtext = "NA";
+			var pagecount = 5;
+			pagenum = 1;
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&userid="+userid+ "&pagenum="+pagenum+ "&pagecount="+pagecount+ "&searchtext="+searchtext;
+			ajax_request(true,pagename,data_parameters,loadmsginpopover);
+		}else{
+			var obj = JSON.parse(response);
+			msgglobalobj = obj;
+			msgstr = '<table id="msginpopoverheader" class="table table-hover" style="width:260px;"><tbody>';
+			if(obj[0].status != "N"){
+				for(var i = 0; i < obj.length; i++){
+					var innermsg = obj[i].msg_remarks.replace("\n");
+					var innermsg = innermsg.replace("\r");
+					msgstr += '<tr><td  id="wrapdatatable" style="cursor:pointer" onclick="showmessagedialog(\''+i+'\')">'+obj[i].msg_remarks+'</td></tr>';	
+				}
+				
+				msgstr += '</tbody></table>';
+				msgstr += '<button type="button" class="btn btn-default" style="margin-left:-8px; cursor:pointer; width:260px;" onClick="location.href=\'home.html?pagetype=message\'">See all messages</button>';
+				$("#msginpopoverinner").attr("data-content",msgstr);
+				$("#msginpopoverinner").popover('show');
+			}
+		}
+	}
+}
+
+
+function showmessagedialog(value){
+	var str = '<table class="table" id="tblthermGrid"><tbody>';
+	str += '<tr><td style="font-weight:bold">Sent On</td><td>:</td><td>'+msgglobalobj[value].create_dt+'</td></tr>';	
+	str += '<tr><td  style="font-weight:bold">Sent By</td><td>:</td><td>'+msgglobalobj[value].sent_by+'</td></tr>';	
+	str += '<tr><td style="font-weight:bold">Message</td><td>:</td><td>'+msgglobalobj[value].msg_remarks+'</td></tr>';	
+	str += '</tbody></table>';
+	document.getElementById("messagepopupsuccessinner").innerHTML = str;
+	$('#messagepopupsuccess').modal({
+		keyboard: true,
+		backdrop: 'static'
+	});
+	$("#msginpopoverinner").popover('hide');
+}
+
+//======================Maintain Session=================
+var GlobalSensonLogoutEvent = "";
+function flash() {
+	var d = new Date();
+	if(GlobalSensonLogoutEvent != ""){
+		var Timediff =  d.getTime() - GlobalSensonLogoutEvent;
+		var seconds = Timediff / 1000;
+		var minutes = parseInt( seconds / 60 );
+		if(minutes >= 15){
+			$('#sessionexpiredalert').modal({
+				keyboard: true,
+				backdrop: 'static'
+			});
+			
+		}
+	}
+	GlobalSensonLogoutEvent = d.getTime();
+}
+
+function destroysession(){
+	window.location.href = 'logout.html';
+}
+window.onclick = flash;
+//======================Maintain Session=================
+
+/*function for loading image show and hide */
+function showloadingimage(){
+	$(".loading-div").show();
+	$("#wrapper").css({"pointer-events":"none","opacity":"0.8"});
+}
+
+function hideloadingimage(){
+	$(".loading-div").hide();
+	$("#wrapper").css({"pointer-events":"auto","opacity":"1"});
+}
+/*function for loading image show and hide */
+</script>
+
+
+</head>
+
+<body>
+<div class="loading-div"><img src="images/ajax-loader.gif" ></div>
+<!-- ===============Session Expired alert============-->
+<div id="sessionexpiredalert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info" style="background-color:#D43F3A; color:#FFF">
+                    <h4 class="modal-title">Warning</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Your session has expired.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onClick="destroysession()">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Session Expired alert============-->
+
+<!-- ===============Change password Dialog============-->
+<div id="changepassword" class="modal fade" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Reset Password</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					<div class="form-group has-feedback" id="headopwd">
+                        <label class="col-sm-2 control-label" for="inputWarning">Old Password</label>
+                         <div class="col-sm-3">
+                            <input type="password" class="form-control" id="opwd">
+                            <span id="feedopwd"></span>
+                            <span id="passwordwarning" style="display:none;" class="help-block">Old password is wrong.</span>
+                          </div>
+                        </div>
+                        <div class="form-group has-feedback" id="headnpwd">
+                          <label class="col-sm-2 control-label" for="inputWarning">New Password</label>
+                          <div class="col-sm-3">
+                            <input type="password" class="form-control" id="npwd">
+                            <span id="feednpwd"></span>
+                          </div>
+                        </div>
+                        <div class="form-group has-feedback" id="headcpwd">
+                          <label class="col-sm-2 control-label" for="inputError">Confirm Password</label>
+                          <div class="col-sm-3">
+                            <input type="password" class="form-control" id="cpwd">
+                            <span id="feedcpwd"></span>
+                            <span id="cpwdwarning" style="display:none;" class="help-block">New & Confirm password didn't matched.</span>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="button" id="save-changes" class="btn btn-primary" onClick="resetpass(true,'changepassword')" value="Save changes" >
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Change password Dialog============-->
+
+
+<!-- ===============Change password success Dialog============-->
+<div id="changepasswordsuccess" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Success</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Password changed successfully.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Change password success Dialog============-->
+
+
+<!-- ===============Thermostat offline alert============-->
+<div id="thermostatofflinealert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success"  style="background-color:#D43F3A; color:#FFF">
+                    <h4 class="modal-title">Warning</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					Thermostat is offline.Please select another thermostat.<br/><br/>
+                        <div class="form-group col-sm-3" >
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Location
+                                <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1"id="locationofflinelist">
+                                </ul>
+                            </div>
+                        </div>
+                   	</div>
+                </div>
+
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============Thermostat offline alert============-->
+
+
+<!-- ===============No Thermostat in list alert============-->
+<div id="nothermostatlistalert" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header modal-header-info alert-modal-success"  style="background-color:#D43F3A; color:#FFF">
+                    <h4 class="modal-title">Warning</h4>
+                </div>
+                <form class="form-horizontal" role="form">
+                <div class="modal-body">
+                    <div class="container">
+     					No Thermostat in selected location please select another.<br/><br/>
+                        <div class="form-group col-sm-3" >
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Location
+                                <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1"id="locationofflinelist1">
+                                </ul>
+                            </div>
+                        </div>
+                   	</div>
+                </div>
+
+                </form>
+            </div>
+        </div>
+</div>
+<!-- ===============No Thermostat in list alert============-->
+
+		<!-- ===============Message show dialog Success============-->
+        <div id="messagepopupsuccess" class="modal fade">
+        	<div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-info alert-modal-success">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Message Details</h4>
+                        </div>
+                        <div class="modal-body" id="messagepopupsuccessinner">
+                         
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        </div>
+                        
+                    </div>
+                </div>
+        </div>
+        <!-- ===============Message show dialog Success============-->
+
+
+<div id="wrapper" class="userselectnone">
+		<!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand"></li>
+                <li id="sidebaradmindashboard"><a href="home.html?pagetype=dashboard" id="dashboard">  &nbsp;Home</a></li>
+                <li id="sidebaradminsetup"><a href="home.html?pagetype=setup" id="setup">&nbsp;Admin Setup</a></li>
+                <li id="sidebaradminmessage"><a href="home.html?pagetype=message" id="message">&nbsp;Messages</a></li>
+                <li id="sidebaradminsensorconfiguration"><a href="home.html?pagetype=sensorconfiguration" id="sensorconfiguration">&nbsp;Sensors Configuration</a></li>
+                <li id="sidebaradminrootcontrol"><a href="home.html?pagetype=rootcontrol" id="rootcontrol">&nbsp;Root Control</a></li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div>
+            <div>
+              <!--<div class="row">-->
+                    <div class="col-lg-12">
+                    	<a href="#menu-toggle" class="btn side-button-style rotate" id="menu-toggle" style="margin-left:-54px; position:fixed; margin-top:200px; opacity:0.5; background:#FFF; z-index:1; border:1px solid #069; border-radius:0px;" onMouseOver="changeopacity()" onMouseOut="changeopacity1()">Toggle Menu</a>
+                        <nav class="navbar navbar-custom navbar-fixed-top">
+                          <div class="container-fluid all_bgcolor_withfontcolor">
+                            <div class="navbar-header">
+                             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigationbar">
+                               <span class="sr-only">Toggle navigation</span>
+                               <span class="icon-bar"></span>
+                               <span class="icon-bar"></span>
+                               <span class="icon-bar"></span>
+                             </button>
+                              <a class="navbar-brand fontwhite_color" href="home.html?pagetype=dashboard" style="font-size:24px">[ root ]</a>
+                            </div>
+                            <div>
+                            <div class="collapse navbar-collapse" id="navigationbar">
+                             <ul class="nav navbar-nav navbar-right">
+                             		<!-- drop down for Location -->
+                                    <li class="dropdown" style="cursor:pointer">
+                                      <a class="dropdown-toggle fontwhite_color" data-toggle="dropdown"><span  id="location_value"> Select Location</span> <span class="caret"></span></a>
+                                      <ul class="dropdown-menu" id="location_value_inner" style="background:#FFF; cursor:pointer;">
+                                      
+                                      </ul>
+                                    </li>
+                                    <!-- drop down for thermostat -->
+                                    <li class="dropdown" style="cursor:pointer">
+                                      <a class="dropdown-toggle fontwhite_color" data-toggle="dropdown"><span  id="thermostat_value"> Select Thermostat</span> <span class="caret"></span></a>
+                                      <ul class="dropdown-menu" id="thermostat_value_inner" style="background:#FFF; cursor:pointer; border:none">
+                                      
+                                      </ul>
+                                    </li>
+                                    <li id="msginpopoverinner" style="cursor:pointer" onClick="loadmsginpopover(true,'ok')" title="<b>Messages</b>"  data-container="body" data-toggle="popover" data-placement="bottom">
+                                    	<a class="fontwhite_color"><span class="glyphicon glyphicon-envelope">
+                                        </span><span style="margin-top:-5px; vertical-align:top;" class="badge badge-warning" id="messagecout"></span>
+                                        </a>
+  									</li>
+                                    <li style="cursor:pointer"><a class="fontwhite_color launch-changepwd"><span class="glyphicon glyphicon-lock"></span> &nbsp;Change Password</a></li>
+                                    <li><a href="logout.html" class="fontwhite_color"><span class="glyphicon glyphicon-log-out"></span> &nbsp;Logout</a></li>
+                               </ul>
+                               
+                               </div>
+                            </div>
+                          </div>
+                        </nav>
+                        <div id="sb-site"></div>
+                    </div>
+                <!--</div>-->
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+
+
+<div class="footer navbar-fixed-bottom header_bgcolor_withfontcolor">
+  <div class="container">
+    <p></p>
+  </div>
+</div>
+</body>
+
+<script>
+
+var idParameter = getUrlVars()["pagetype"];
+flash();
+loadlocationinulbox(true,"ok");
+loadpageheader(idParameter);
+
+$("#menu-toggle").click(function(e) {
+	e.preventDefault();
+	$("#wrapper").toggleClass("toggled");
+});
+
+if(screen.width > 780){
+	//$("#wrapper").toggleClass("toggled");
+}
+
+$(function () 
+	{ $("[data-toggle='popover']").popover({html : true });
+	/* code for hide other popover if other open*/
+	$('body').on('click', function (e) {
+		$('[data-toggle="popover"]').each(function () {
+				//the 'is' for buttons that trigger popups
+				//the 'has' for icons within a button that triggers a popup
+			if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+				$(this).popover('hide');
+			}
+		});
+	});
+	/* code for hide other popover if other open above*/	
+});
+
+
+</script>
+</html>

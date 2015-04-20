@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='css/config.css' rel='stylesheet' />
+<script>showloadingimage();</script>
+<script>
+var userarr="";
+
+/* roomdata on page*/
+function loadroomdata(bool,response){
+	if(bool){
+		pagename = "get_room";
+		var data_parameters = "slocid="+slocid+ "&orgid="+orgid;
+		ajax_request(true,pagename,data_parameters,loadroomdata);
+	}else{
+		hideloadingimage();
+		var obj = JSON.parse(response);
+		var str = "";
+		if(obj[0].status != "N"){
+			for(var i = 0,j = 1; i < obj.length; i++,j++){
+				if(obj[i].room_active_yn == "N")str += '<tr  class="danger">';
+				else str += '<tr>';
+				str += '<td>'+obj[i].room_name+'</td><td>'+obj[i].username+'</td><td>'+obj[i].create_dt+'</td><td>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-edit" style="cursor:pointer" title="Edit" onClick="hideshowdivroom(\''+obj[i].room_id +'\',\''+obj[i].room_name+'\',\''+obj[i].room_active_yn+'\')"></span></td></tr>';	
+			}
+			document.getElementById("Roomdataload").innerHTML = str;
+			
+			if(obj.length > 8)$('#Roomdatatable').dataTable({"bPaginate": true, "bLengthChange": false, "iDisplayLength":8});
+			else $('#Roomdatatable').dataTable({"bPaginate": false});
+		}
+	}
+}
+//end load roomdata on page-->
+
+//save Roomdata
+function saveRoom(bool,response){
+	if(bool){
+		document.getElementById("Roomaddbutton").disabled = false;
+		document.getElementById("Roomnameerror").style.display = 'none';
+		document.getElementById("Roomnamesuccessicon").style.display = 'none';
+		document.getElementById("Roomnamewarningicon").style.display = 'none';
+		document.getElementById("Roomnamewarning").style.display = 'none';
+		document.getElementById("Roomnameerrorheader").className = 'form-group has-feedback';
+		document.getElementById("Roomnamewarning").style.display = 'none';
+	
+		if(response != "" ){
+			pagename = "room";
+			flag = "A";
+			roomactiveyn = "Y";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&roomname="+response+ "&flag="+flag+ "&id="+userid+ "&roomactiveyn="+roomactiveyn+ "&roomid="+0;
+			ajax_request(true,pagename,data_parameters,saveRoom);
+		}
+		else{
+			if(response == ""){
+				document.getElementById("Roomnameerror").style.display = 'block';
+				document.getElementById("Roomnameerrorheader").className = 'form-group has-feedback has-error'; 
+			}
+		}
+	} else {
+		var obj = JSON.parse(response);
+		if(obj[0].status != "N"){
+			if(obj[0].status == "Y"){
+				document.getElementById("Roomname").value = "";
+				$('#roomsuccesssalert').modal({keyboard: true});
+			}
+			if(obj[0].status == "E"){
+				document.getElementById("Roomnamewarning").style.display = 'block';
+				document.getElementById("Roomnameerrorheader").className = 'form-group has-feedback has-warning'; 
+			}
+			//$('#Roomdatatable').dataTable().fnDestroy();
+			//loadloactiondata(true,"ok");
+		}
+		loadroomdata(true,"ok");
+	}
+}
+//end save Roomdata
+
+//show Roomname and place values
+function hideshowdivroom(id,value,activeyn){
+	
+	if(activeyn == "N")document.getElementById("Roomactiveyn").checked = false;
+	else document.getElementById("Roomactiveyn").checked = true;
+
+	document.getElementById("editRoomerror2").style.display = 'none';
+	document.getElementById("editRoomsuccessicon").style.display = 'none';
+	document.getElementById("editRoomwarningicon").style.display = 'none';
+	document.getElementById("editRoomwarning").style.display = 'none';
+	document.getElementById("editRoomerrorheader2").className = 'form-group has-feedback';
+	
+	document.getElementById("editRoomid").value = id;
+	document.getElementById("editRoomname1").value = value;
+	document.getElementById("editRoomdiv").style.display = 'block';
+	document.getElementById("addRoomdiv").style.display = 'none';
+}
+//show Roomname and place values
+
+//hide Roomname
+function exitRoomdivhide(){
+	document.getElementById("Roomnameerror").style.display = 'none';
+	document.getElementById("Roomnamesuccessicon").style.display = 'none';
+	document.getElementById("Roomnamewarningicon").style.display = 'none';
+	document.getElementById("Roomnamewarning").style.display = 'none';
+	document.getElementById("Roomnameerrorheader").className = 'form-group has-feedback';
+	document.getElementById("Roomnamewarning").style.display = 'none';
+		
+	document.getElementById("editRoomdiv").style.display = 'none';
+	document.getElementById("addRoomdiv").style.display = 'block';
+}
+//hide Roomname
+
+
+//save editRoomname
+function editRoomname(bool,response){
+	if(bool){
+		if(document.getElementById("Roomactiveyn").checked){
+			roomactiveyn = "Y";
+		}
+		else roomactiveyn = "N";
+		var room_id = document.getElementById("editRoomid").value;
+			
+		if(response != ""){
+			pagename = "room";
+			flag = "E";
+			var data_parameters = "slocid="+slocid+ "&orgid="+orgid+ "&flag="+flag+ "&roomname="+response+ "&id="+userid+ "&roomactiveyn="+roomactiveyn+ "&roomid="+room_id;
+			ajax_request(true,pagename,data_parameters,editRoomname);
+		}
+		else{
+			if(response == ""){
+				document.getElementById("editRoomerror2").style.display = 'block';
+				document.getElementById("editRoomerrorheader2").className = 'form-group has-feedback has-error';
+			}
+		}
+	}else{
+		var obj = JSON.parse(response);
+		document.getElementById("Roomnameerror").style.display = 'none';
+		document.getElementById("Roomnamesuccessicon").style.display = 'none';
+		document.getElementById("Roomnamewarningicon").style.display = 'none';
+		document.getElementById("Roomnamewarning").style.display = 'none';
+		document.getElementById("Roomnameerrorheader").className = 'form-group has-feedback';
+		document.getElementById("Roomnamewarning").style.display = 'none';
+		
+		if(obj[0].status != "N"){
+			if(obj[0].status == "Y"){
+				$('#Roomupdatesucess').modal({
+					keyboard: true 
+				});
+				document.getElementById("editRoomdiv").style.display = 'none';
+				document.getElementById("addRoomdiv").style.display = 'block';
+				$('#Roomdatatable').dataTable().fnDestroy();
+				loadroomdata(true,"ok");	
+			}
+			if(obj[0].status == "E"){
+				document.getElementById("editRoomwarning").style.display = 'block';
+				document.getElementById("editRoomerrorheader2").className = 'form-group has-feedback has-warning'; 
+			}
+		}
+	}
+}
+//end save editRoomname
+</script>
+</head>
+<body>
+<div class="container">
+    <div class="row"><br/>
+    	<div id="addRoomdiv1"> 
+            <!--addRoom div-->
+            <div id="addRoomdiv" class="col-sm-3" style="border:1px solid #CCC;">
+                <h4><b>Add New Room</b></h4><hr>
+                    <div id="Roomalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div class="alert alert-success fade">
+                        <strong>Success! </strong> Room added successfully.
+                        </div>
+                    </div>
+                    
+                    <div id="Roomnameerrorheader" class="form-group has-feedback">
+                    
+                     <label for="inputError2">Name</label>
+                         <input type="text" class="form-control" id="Roomname">
+                         <input type="hidden" id="Roomnamevalidatecheck" \>
+                         <span id="Roomnameerror" style="display:none;" class="help-block">Please fill out this field</span>
+                         <span id="Roomnamesuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                         <span id="Roomnamewarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                         <span id="Roomnamewarning" style="display:none;" class="help-block">Name already exists.</span>
+                    </div>
+                    
+                   	<button onClick="saveRoom(true,Roomname.value)" type="button" id="Roomaddbutton" class="all-btn-custom btn-sm btn-block ">
+                        <span class="glyphicon glyphicon-plus"></span> ADD
+                    </button>
+                    <br />
+            </div><!--end addRoom div-->
+        
+            <!-- ===============Room Added succefull============-->
+            <div id="roomsuccesssalert" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header modal-header-info alert-modal-success">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Success</h4>
+                        </div>
+                        <form class="form-horizontal" role="form">
+                        <div class="modal-body">
+                            <div class="container">
+                                Room added successfully.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- ===============Room Added succefull============-->
+                   
+            <!-- ===============Update Detail Success============-->
+            <div id="Roomupdatesucess" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header modal-header-info alert-modal-success">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Success</h4>
+                            </div>
+                            <form class="form-horizontal" role="form">
+                            <div class="modal-body">
+                                <div class="container">
+                                    Room updated successfully.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+            <!-- ===============Update Detail Success============-->
+
+        
+            <!--  Edit Department  -->   
+            <div id="editRoomdiv" class="col-sm-3" style="border:1px solid #CCC; display:none;">
+                <h4><b>Edit Room</b></h4><hr>
+                    <div id="editRoomalertsuccess" class="span4 pull-center" style="display:none;">
+                        <div id="deptalert" class="alert alert-success fade">
+                        <strong>Success! </strong> Room Updated successfully.
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback" id="editRoomerrorheader2">
+                        <label for="inputError2">Room Name</label>
+                        <input type="text" class="form-control" id="editRoomname1">
+                        <input type="hidden" id="editRoomvalidatecheck" \>
+                        <input type="hidden" id="editRoomid" \>
+                        
+                        <span id="editRoomerror2" style="display:none;" class="help-block">Please fill out this field</span>
+                        <span id="editRoomsuccessicon" style="display:none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                        <span id="editRoomwarningicon" style="display:none" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                        <span id="editRoomwarning" style="display:none;" class="help-block">Room already exists</span>
+                        
+                    </div>
+                    
+                    <div class="form-group has-feedback" id="editclassificationheader">
+                    	<b>Active</b> <input type="checkbox" id="Roomactiveyn" checked />
+            		</div>
+                
+                    <div class="form-group">         
+                        <button  class="btn-exit" style="width:49%" onClick="exitRoomdivhide()">Exit</button>
+                        <button id="editRoomdate" class="btn-adddetail" style="width:49%" onClick="editRoomname(true,editRoomname1.value)">Update</button>
+                    </div>
+                    <br />
+            </div>
+            <!--  Edit Department  -->  
+        
+ 
+            <div  id="loadRoomdetaildata" class="col-sm-9">
+            <table id="Roomdatatable" class="table table-hover">
+               <thead>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4>Room List</h4>
+                        </div>
+                    </div>
+                  <tr>
+                     <th>Room</th><th>Modified By</th><th>Modified On</th><th>Action</th>
+                  </tr>
+               </thead>
+               <tbody id="Roomdataload"></tbody>
+             </table>   
+            </div>
+        </div>
+	</div><!--  end Row  -->  
+</div><!--  end container  -->
+</body>
+<script>
+loadroomdata(true,"ok");
+</script>
+</html>
